@@ -70,9 +70,10 @@ function callFragmentApi(endpoint, body) {
       res.on('end', () => {
         try {
           const json = JSON.parse(data);
-          resolve(json);
+          const isSuccess = res.statusCode < 400 && json.ok !== false;
+          resolve({ status: res.statusCode, ok: isSuccess, data: json });
         } catch (e) {
-          resolve({ ok: res.statusCode < 400, raw: data });
+          resolve({ status: res.statusCode, ok: false, error: 'Fragment API javobida xatolik', raw: data });
         }
       });
     });
@@ -122,7 +123,6 @@ module.exports = async (req, res) => {
   let price = 0;
 
   if (productType.toLowerCase().includes('premium')) {
-    // Premium package
     price = parseInt(body.amount, 10);
     if (!price || isNaN(price)) {
       if (months === 12) price = 380000;
@@ -131,15 +131,12 @@ module.exports = async (req, res) => {
     }
     quantity = months || 3;
   } else if (productType.toLowerCase().includes('nomer')) {
-    // Phone service
     price = parseInt(body.amount, 10) || 18000;
     quantity = 1;
   } else {
-    // Stars package
     quantity = parseInt(body.quantity, 10) || 50;
     price = parseInt(body.amount, 10);
     
-    // If frontend didn't pass exact price, calculate with tiered discount
     if (!price || isNaN(price)) {
       if (quantity >= 1000) price = quantity * 190;
       else if (quantity >= 100) price = quantity * 190;
@@ -165,7 +162,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Call Fragment API if relevant
+    // Call Fragment API if relevant (Stars or Premium)
     let fragRes = null;
     if (productType.toLowerCase().includes('premium')) {
       fragRes = await callFragmentApi('premium/buy', { username: username, months: quantity });
@@ -173,15 +170,24 @@ module.exports = async (req, res) => {
       fragRes = await callFragmentApi('stars/buy', { username: username, amount: quantity });
     }
 
-    // Deduct balance
+    // STRICT VALIDATION: If Fragment API failed (e.g. insufficient funds in Fragment wallet), reject order and DO NOT deduct balance!
+    if (fragRes && !fragRes.ok) {
+      const errMsg = fragRes.data?.message || fragRes.error || "Hamyonda to'lov uchun yetarli mablag' yo'q.";
+      return res.status(400).json({
+        ok: false,
+        error: `⚠️ Xarid amalga oshmadi: ${errMsg}`,
+      });
+    }
+
+    // Deduct balance only after successful API call
     const newBal = balance - price;
     await db.query('UPDATE users SET balance = $1 WHERE telegram_id = $2', [newBal, userId]);
 
-    // Record order
+    // Record completed order
     const orderRes = await db.query(
       `INSERT INTO orders (telegram_id, product_type, target_username, quantity, amount, status, external_id, created_at)
        VALUES ($1, $2, $3, $4, $5, 'completed', $6, NOW()) RETURNING id`,
-      [userId, productType, username, quantity, price, fragRes?.id ? String(fragRes.id) : null]
+      [userId, productType, username, quantity, price, fragRes?.data?.result?.id ? String(fragRes.data.result.id) : null]
     );
 
     // Send confirmation message in Telegram Bot
@@ -193,7 +199,7 @@ module.exports = async (req, res) => {
         `⏳ Muddat: <b>${quantity} Oylik</b>\n` +
         `💰 To'langan: <b>${price.toLocaleString('uz-UZ')} so'm</b>\n` +
         `👛 Qolgan balans: <b>${newBal.toLocaleString('uz-UZ')} so'm</b>\n\n` +
-        `<i>Premium tez orada obuna qilinadi!</i>`;
+        `<i>Premium faollashtirildi!</i>`;
     } else {
       userMsg = 
         `⭐️ <b>STARS XARID QILINDI!</b>\n\n` +
@@ -201,7 +207,7 @@ module.exports = async (req, res) => {
         `💫 Miqdor: <b>${quantity.toLocaleString('uz-UZ')} Stars</b>\n` +
         `💰 To'langan: <b>${price.toLocaleString('uz-UZ')} so'm</b>\n` +
         `👛 Qolgan balans: <b>${newBal.toLocaleString('uz-UZ')} so'm</b>\n\n` +
-        `<i>Xaridingiz uchun rahmat! Stars hisobingizga tushadi.</i>`;
+        `<i>Xaridingiz uchun rahmat! Stars hisobingizga tushdi.</i>`;
     }
 
     await sendTelegramMessage(botToken, userId, userMsg);
