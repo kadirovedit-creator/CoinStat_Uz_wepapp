@@ -1,13 +1,12 @@
-"""Client for Fragment API Uz — https://fragment-api.uz/"""
+"""Client for Fragment API Uz — https://fragment-api.uz/api/v1"""
 
 from __future__ import annotations
 
 import logging
 from typing import Any
-
 import aiohttp
 
-from bot.config import settings
+import config
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +24,9 @@ class FragmentAPI:
         api_key: str | None = None,
         base_url: str | None = None,
     ):
-        # Strip all whitespace including newlines, carriage returns
-        raw_key = api_key or settings.fragment_api_key or ""
-        self.api_key = "".join(raw_key.split())  # Remove ALL whitespace
-        self.base_url = (base_url or settings.fragment_api_base).rstrip("/")
+        raw_key = api_key or getattr(config, 'FRAGMENT_API_KEY', '') or ""
+        self.api_key = "".join(raw_key.split())
+        self.base_url = (base_url or getattr(config, 'FRAGMENT_API_URL', 'https://fragment-api.uz/api/v1')).rstrip("/")
 
     def _headers(self) -> dict[str, str]:
         return {
@@ -47,14 +45,14 @@ class FragmentAPI:
         timeout = aiohttp.ClientTimeout(total=30)
         async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.request(
-                method, url, headers=self._headers(), json=json
+                method, url, headers=self._headers(), json=json or {}
             ) as resp:
                 try:
                     data = await resp.json(content_type=None)
                 except Exception:
                     data = {"raw": await resp.text()}
 
-                if resp.status >= 400:
+                if resp.status >= 400 or (isinstance(data, dict) and data.get("ok") is False):
                     msg = data.get("message") or data.get("error") or str(data)
                     raise FragmentAPIError(msg, resp.status, data)
                 if isinstance(data, dict):
@@ -63,31 +61,27 @@ class FragmentAPI:
 
     async def get_balance(self) -> dict[str, Any]:
         """Project wallet balance on Fragment platform."""
-        for path in ("wallet/balance", "balance", "account/balance"):
-            try:
-                return await self._request("GET", path)
-            except FragmentAPIError as e:
-                if e.status == 404:
-                    continue
-                raise
-        return {"balance": None, "note": "Adjust FRAGMENT_API_BASE per docs"}
+        res = await self._request("POST", "wallet/balance", json={})
+        return res.get("result", res)
 
     async def get_stars_price(self, quantity: int) -> dict[str, Any]:
-        for path in ("stars/price", "prices/stars"):
-            try:
-                return await self._request(
-                    "POST", path, json={"quantity": quantity}
-                )
-            except FragmentAPIError:
-                try:
-                    return await self._request(
-                        "GET", f"{path}?quantity={quantity}"
-                    )
-                except FragmentAPIError:
-                    continue
-        return {"quantity": quantity, "price": None}
+        """Get Telegram Stars prices."""
+        res = await self._request("POST", "stars/pricing", json={"amount": quantity})
+        return res.get("result", res)
+
+    async def get_premium_prices(self) -> dict[str, Any]:
+        """Get Telegram Premium packages pricing."""
+        res = await self._request("POST", "premium/pricing", json={})
+        return res.get("result", res)
+
+    async def get_user_info(self, username: str) -> dict[str, Any]:
+        """Get Telegram user info from fragment."""
+        username = username.lstrip("@")
+        res = await self._request("POST", "getInfo", json={"username": username})
+        return res.get("result", res)
 
     async def buy_stars(self, username: str, quantity: int) -> dict[str, Any]:
+        """Buy Telegram Stars."""
         username = username.lstrip("@")
         return await self._request(
             "POST",
@@ -96,37 +90,14 @@ class FragmentAPI:
         )
 
     async def buy_premium(self, username: str, months: int) -> dict[str, Any]:
+        """Buy Telegram Premium."""
         username = username.lstrip("@")
         return await self._request(
             "POST",
             "premium/buy",
-            json={"username": username, "duration": months},
+            json={"username": username, "months": months},
         )
 
-    async def buy_gift(self, username: str, gift_id: str) -> dict[str, Any]:
-        """
-        DEPRECATED: Fragment API не поддерживает отправку подарков.
-        Используйте services.telethon_client.gift_sender вместо этого.
-        """
-        return {
-            "ok": False,
-            "error": "Gift sending not supported by Fragment API. Use Telethon instead."
-        }
 
-    async def buy_phone(self, username: str, country: str) -> dict[str, Any]:
-        username = username.lstrip("@")
-        for path in ("phone/buy", "orders/phone", "number/order"):
-            try:
-                return await self._request(
-                    "POST",
-                    path,
-                    json={"username": username, "country": country},
-                )
-            except FragmentAPIError as e:
-                if e.status == 404:
-                    continue
-                raise
-        raise FragmentAPIError("Phone endpoint not found — check API docs")
-
-
-fragment_client = FragmentAPI()
+fragment_api = FragmentAPI()
+fragment_client = fragment_api

@@ -960,13 +960,13 @@ async def api_user_transactions(request: web.Request) -> web.Response:
   user_id = _user_id_from_auth(auth)
   body = await _json_body(request)
   if not user_id:
-    user_id = body.get("telegram_id")
+    user_id = body.get("telegram_id") or request.query.get("telegram_id")
   if not user_id:
     return web.json_response({"ok": False, "error": "Unauthorized"}, status=401)
 
   from services.database import db_conn
   orders_rows = await db_conn.fetch(
-    "SELECT * FROM orders WHERE telegram_id = $1 AND status NOT IN ('cancelled', 'failed') AND (product_type IS NULL OR product_type NOT IN ('topup', 'balance')) ORDER BY id DESC LIMIT 100",
+    "SELECT * FROM orders WHERE telegram_id = $1 ORDER BY id DESC LIMIT 100",
     int(user_id)
   )
   balance_rows = await db_conn.fetch(
@@ -984,10 +984,15 @@ async def api_user_transactions(request: web.Request) -> web.Response:
   orders = [serialize(r) for r in orders_rows]
   balance_history = [serialize(r) for r in balance_rows]
 
+  actual_orders = [o for o in orders if o.get("product_type") not in ("topup", "balance") and o.get("status") not in ("cancelled", "failed")]
+  total_spent = sum(int(o.get("amount") or 0) for o in actual_orders if o.get("status") in ("completed", "paid"))
+
   return web.json_response({
     "ok": True,
     "orders": orders,
     "balance_history": balance_history,
+    "total_spent": total_spent,
+    "orders_count": len(actual_orders),
   })
 
 
@@ -1056,40 +1061,107 @@ async def api_user_referrals(request: web.Request) -> web.Response:
 
 
 async def api_rating(request: web.Request) -> web.Response:
-  auth = await _auth_user(request)
-  user_id = _user_id_from_auth(auth)
   body = await _json_body(request)
-  if not user_id:
-    user_id = body.get("telegram_id")
-  if not user_id:
-    return web.json_response({"ok": False, "error": "Unauthorized"}, status=401)
-
-  period = body.get("period", "all")
+  period = body.get("period") or request.query.get("period") or "all"
   if period not in ("today", "week", "month", "all"):
     period = "all"
 
-  where = "WHERE o.status IN ('completed', 'paid')"
+  from services.database import db_conn, IS_SQLITE
 
-  from services.database import db_conn
-  rows = await db_conn.fetch(f"""
-    SELECT o.telegram_id, u.username, SUM(o.amount) as total
-    FROM orders o
-    LEFT JOIN users u ON o.telegram_id = u.telegram_id
-    {where}
-    GROUP BY o.telegram_id, u.username
-    ORDER BY total DESC
-    LIMIT 50
-  """)
+  if IS_SQLITE:
+    if period == "today":
+      time_cond = "AND date(o.created_at) = date('now')"
+    elif period == "week":
+      time_cond = "AND o.created_at >= datetime('now', '-7 days')"
+    elif period == "month":
+      time_cond = "AND o.created_at >= datetime('now', '-30 days')"
+    else:
+      time_cond = ""
+
+    query = f"""
+      SELECT 
+        u.telegram_id, 
+        u.username, 
+        u.full_name,
+        (
+          COALESCE((
+            SELECT SUM(o.amount) 
+            FROM orders o 
+            WHERE o.telegram_id = u.telegram_id 
+              AND o.status IN ('completed', 'paid') 
+              {time_cond}
+          ), 0) + COALESCE(u.balance, 0)
+        ) as total
+      FROM users u
+      WHERE u.balance > 0 OR EXISTS (
+        SELECT 1 FROM orders o 
+        WHERE o.telegram_id = u.telegram_id 
+          AND o.status IN ('completed', 'paid') 
+          {time_cond}
+      )
+      ORDER BY total DESC, u.balance DESC
+      LIMIT 50
+    """
+  else:
+    if period == "today":
+      time_cond = "AND o.created_at >= CURRENT_DATE"
+    elif period == "week":
+      time_cond = "AND o.created_at >= NOW() - INTERVAL '7 days'"
+    elif period == "month":
+      time_cond = "AND o.created_at >= NOW() - INTERVAL '30 days'"
+    else:
+      time_cond = ""
+
+    query = f"""
+      SELECT 
+        u.telegram_id, 
+        u.username, 
+        u.full_name,
+        (
+          COALESCE((
+            SELECT SUM(o.amount) 
+            FROM orders o 
+            WHERE o.telegram_id = u.telegram_id 
+              AND o.status IN ('completed', 'paid') 
+              {time_cond}
+          ), 0) + COALESCE(u.balance, 0)
+        ) as total
+      FROM users u
+      WHERE u.balance > 0 OR EXISTS (
+        SELECT 1 FROM orders o 
+        WHERE o.telegram_id = u.telegram_id 
+          AND o.status IN ('completed', 'paid') 
+          {time_cond}
+      )
+      ORDER BY total DESC, u.balance DESC
+      LIMIT 50
+    """
+
+  rows = await db_conn.fetch(query)
 
   rating = []
   for r in rows:
     rating.append({
       "telegram_id": r["telegram_id"],
-      "username": r["username"],
-      "total": r["total"],
+      "username": r["username"] or (r["full_name"] if r["full_name"] else f"User#{r['telegram_id']}"),
+      "total": int(r["total"] or 0),
     })
 
-  return web.json_response({"ok": True, "rating": rating})
+  if not rating:
+    top_users = await db_conn.fetch("""
+      SELECT telegram_id, username, full_name, balance as total
+      FROM users
+      ORDER BY balance DESC, referrals DESC
+      LIMIT 10
+    """)
+    for u in top_users:
+      rating.append({
+        "telegram_id": u["telegram_id"],
+        "username": u["username"] or (u["full_name"] if u["full_name"] else f"User#{u['telegram_id']}"),
+        "total": int(u["total"] or 0),
+      })
+
+  return web.json_response({"ok": True, "period": period, "rating": rating})
 
 
 async def api_contest(request: web.Request) -> web.Response:

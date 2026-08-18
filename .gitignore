@@ -1,2 +1,4 @@
 .vercel
-.webp
+node_modules/
+__pycache__/
+*.pyc

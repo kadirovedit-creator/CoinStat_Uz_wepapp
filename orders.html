@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CoinStat UZ - Buyurtmalar</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>window.API_BASE = 'https://test-uz-r78q.onrender.com';</script>
     <link rel="stylesheet" href="css/style.css?v=10.0">
     <style>
         .orders-container {
@@ -703,20 +702,13 @@
         }
 
         function getProductMeta(type) {
-            switch(type) {
-                case 'stars':
-                    return { icon: '⭐', name: 'Telegram Stars', color: '#f59e0b' };
-                case 'premium':
-                    return { icon: '💎', name: 'Telegram Premium', color: '#0284c7' };
-                case 'gift':
-                    return { icon: '🎁', name: 'Telegram Gift', color: '#ec4899' };
-                case 'phone':
-                    return { icon: '📱', name: 'Virtual Nomer', color: '#8b5cf6' };
-                case 'topup':
-                    return { icon: '💰', name: "Hisobni to'ldirish", color: '#22c55e' };
-                default:
-                    return { icon: '📦', name: 'Xizmat', color: '#38bdf8' };
-            }
+            const t = (type || '').toLowerCase();
+            if (t === 'stars') return { icon: '⭐', name: 'Telegram Stars', color: '#f59e0b' };
+            if (t === 'premium') return { icon: '💎', name: 'Telegram Premium', color: '#0284c7' };
+            if (t === 'gift') return { icon: '🎁', name: 'Telegram Gift', color: '#ec4899' };
+            if (t === 'phone') return { icon: '📱', name: 'Virtual Nomer', color: '#8b5cf6' };
+            if (t.startsWith('topup') || t === 'balance') return { icon: '💰', name: "Hisobni to'ldirish", color: '#22c55e' };
+            return { icon: '📦', name: 'Xizmat', color: '#38bdf8' };
         }
 
         function getStatusMeta(status) {
@@ -729,6 +721,7 @@
                     return { label: '⏳ Kutilmoqda', class: 'pending' };
                 case 'failed':
                 case 'cancelled':
+                case 'rejected':
                     return { label: '❌ Bekor qilindi', class: 'failed' };
                 default:
                     return { label: status, class: 'pending' };
@@ -755,14 +748,14 @@
             const container = document.getElementById('ordersListContainer');
             if (!container) return;
 
-            let filtered = rawOrdersData.filter(o => {
-                if (o.product_type === 'topup' || o.product_type === 'balance') return false;
-                if (o.status === 'cancelled' || o.status === 'failed') return false;
-                return true;
-            });
+            let filtered = [...rawOrdersData];
 
             if (currentCategory !== 'all') {
-                filtered = filtered.filter(o => o.product_type === currentCategory);
+                filtered = filtered.filter(o => {
+                    const pt = (o.product_type || '').toLowerCase();
+                    if (currentCategory === 'topup') return pt.startsWith('topup') || pt === 'balance';
+                    return pt === currentCategory;
+                });
             }
 
             if (currentStatus !== 'all') {
@@ -771,12 +764,12 @@
                 } else if (currentStatus === 'pending') {
                     filtered = filtered.filter(o => o.status === 'pending' || o.status === 'processing');
                 } else if (currentStatus === 'failed') {
-                    filtered = filtered.filter(o => o.status === 'failed' || o.status === 'cancelled');
+                    filtered = filtered.filter(o => o.status === 'failed' || o.status === 'cancelled' || o.status === 'rejected');
                 }
             }
 
             if (filtered.length === 0) {
-                showEmptyOrders("Hozircha buyurtmalar mavjud emas.");
+                showEmptyOrders("Hozircha buyurtmalar va to'lovlar mavjud emas.");
                 return;
             }
 

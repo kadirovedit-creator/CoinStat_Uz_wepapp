@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CoinStat UZ - Asosiy</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>window.API_BASE = 'https://witty-planes-admire.loca.lt';</script>
     <link rel="stylesheet" href="css/style.css?v=12.0">
     <style>
         .home-container {
@@ -708,26 +707,44 @@
             }
             container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:13px;">Yuklanmoqda...</div>';
 
-            fetch(getApiBase() + '/api/user/transactions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Telegram-Init-Data': tg.initData || '',
-                },
-                body: JSON.stringify({ telegram_id: userId, initData: tg.initData || '' }),
-            })
-            .then(r => r.json())
+            const apiBase = getApiBase();
+            const doFetch = (url) => {
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Telegram-Init-Data': tg.initData || '',
+                    },
+                    body: JSON.stringify({ telegram_id: userId, initData: tg.initData || '' }),
+                }).then(r => r.json());
+            };
+
+            doFetch((apiBase ? apiBase : '') + '/api/user/transactions?telegram_id=' + userId + '&t=' + Date.now())
             .then(data => {
-                if (data.ok) {
+                if (data && data.ok) {
                     modalOrdersData = data.orders || [];
                     modalBalanceData = data.balance_history || [];
                     renderModalTransactions();
+                } else if (apiBase !== '') {
+                    return doFetch('/api/user/transactions?telegram_id=' + userId + '&t=' + Date.now()).then(data2 => {
+                        modalOrdersData = data2.orders || [];
+                        modalBalanceData = data2.balance_history || [];
+                        renderModalTransactions();
+                    });
                 } else {
-                    container.innerHTML = `<div style="text-align:center; color:#ef4444; padding:30px 0; font-size:13px;">${data.error || "Xatolik yuz berdi"}</div>`;
+                    renderModalTransactions();
                 }
             })
             .catch(() => {
-                container.innerHTML = '<div style="text-align:center; color:#ef4444; padding:30px 0; font-size:13px;">Tarmoqda xatolik yuz berdi.</div>';
+                doFetch('/api/user/transactions?telegram_id=' + userId + '&t=' + Date.now())
+                .then(data2 => {
+                    modalOrdersData = data2.orders || [];
+                    modalBalanceData = data2.balance_history || [];
+                    renderModalTransactions();
+                })
+                .catch(() => {
+                    renderModalTransactions();
+                });
             });
         }
 
@@ -737,27 +754,27 @@
 
             if (modalActiveTab === 'orders') {
                 const validOrders = modalOrdersData.filter(o => {
-                    if (o.product_type === 'topup' || o.product_type === 'balance') return false;
-                    if (o.status === 'cancelled' || o.status === 'failed') return false;
+                    if (o.status === 'cancelled' || o.status === 'failed' || o.status === 'rejected') return false;
                     return true;
                 });
 
                 if (validOrders.length === 0) {
-                    container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:13px;">Hozircha xarid qilingan buyurtmalar mavjud emas.</div>';
+                    container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:13px;">Hozircha buyurtmalar va to\'lovlar mavjud emas.</div>';
                     return;
                 }
                 let html = '';
                 validOrders.forEach(o => {
                     let icon = '📦', name = 'Xizmat';
-                    if (o.product_type === 'stars') { icon = '⭐'; name = 'Telegram Stars'; }
-                    else if (o.product_type === 'premium') { icon = '💎'; name = 'Telegram Premium'; }
-                    else if (o.product_type === 'gift') { icon = '🎁'; name = 'Telegram Gift'; }
-                    else if (o.product_type === 'phone') { icon = '📱'; name = 'Virtual Nomer'; }
-                    else if (o.product_type === 'topup') { icon = '💰'; name = 'Balans to\'ldirish'; }
+                    const pt = (o.product_type || '').toLowerCase();
+                    if (pt === 'stars') { icon = '⭐'; name = 'Telegram Stars'; }
+                    else if (pt === 'premium') { icon = '💎'; name = 'Telegram Premium'; }
+                    else if (pt === 'gift') { icon = '🎁'; name = 'Telegram Gift'; }
+                    else if (pt === 'phone') { icon = '📱'; name = 'Virtual Nomer'; }
+                    else if (pt.startsWith('topup') || pt === 'balance') { icon = '💰'; name = 'Hisobni to\'ldirish'; }
 
                     let stLabel = '⏳ Kutilmoqda', stColor = '#f59e0b';
                     if (o.status === 'completed' || o.status === 'paid') { stLabel = '✅ Bajarildi'; stColor = '#22c55e'; }
-                    else if (o.status === 'failed' || o.status === 'cancelled') { stLabel = '❌ Bekor qilindi'; stColor = '#ef4444'; }
+                    else if (o.status === 'failed' || o.status === 'cancelled' || o.status === 'rejected') { stLabel = '❌ Bekor qilindi'; stColor = '#ef4444'; }
 
                     const amt = (o.amount || 0).toLocaleString('uz-UZ');
                     const qtyText = o.quantity ? ` (${o.quantity} ta)` : '';
@@ -771,7 +788,7 @@
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
                                 <span>Summa: <b style="color:var(--accent-sky);">${amt} so'm</b></span>
-                                <span>ID: #${o.id}</span>
+                                <span>ID: #${o.id || o.external_id || '—'}</span>
                             </div>
                             <div style="font-size: 10px; color: var(--text-sub); text-align: right;">${dt}</div>
                         </div>
@@ -974,7 +991,7 @@
 
             rawUserId = String(userId);
 
-            fetch(getApiBase() + '/api/user/transactions', {
+            fetch(getApiBase() + '/api/user/transactions?t=' + Date.now(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -986,17 +1003,19 @@
             .then(data => {
                 if (data.ok) {
                     const allOrders = data.orders || [];
-                    const actualOrders = allOrders.filter(o => o.product_type !== 'topup' && o.product_type !== 'balance' && o.status !== 'cancelled' && o.status !== 'failed');
+                    const validOrders = allOrders.filter(o => o.status !== 'cancelled' && o.status !== 'failed');
                     
                     const ordersCountEl = document.getElementById('ordersCount');
-                    if (ordersCountEl) ordersCountEl.textContent = actualOrders.length;
+                    if (ordersCountEl) ordersCountEl.textContent = validOrders.length;
                     
-                    let spent = 0;
-                    actualOrders.forEach(o => {
-                        if (o.status === 'completed' || o.status === 'paid') {
-                            spent += (o.amount || 0);
-                        }
-                    });
+                    let spent = typeof data.total_spent !== 'undefined' ? data.total_spent : 0;
+                    if (!spent) {
+                        validOrders.forEach(o => {
+                            if (o.status === 'completed' || o.status === 'paid') {
+                                spent += (o.amount || 0);
+                            }
+                        });
+                    }
                     const spentEl = document.getElementById('totalSpent');
                     if (spentEl) spentEl.textContent = spent > 0 ? spent.toLocaleString('uz-UZ') : '0';
                 }
@@ -1007,6 +1026,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadHomeStats();
             filterStatsTime('today');
+
+            // Periodic live sync for stats every 3 seconds
+            setInterval(loadHomeStats, 3000);
 
             // Sync balance stat readout
             const balanceObserver = new MutationObserver(() => {

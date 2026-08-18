@@ -17,10 +17,10 @@ function getApiBase() {
     if (typeof window.API_BASE !== 'undefined' && window.API_BASE && window.API_BASE.trim() !== '') {
         return window.API_BASE.replace(/\/$/, '');
     }
-    if (window.location.protocol.startsWith('http')) {
+    if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
         return window.location.origin;
     }
-    return 'https://test-uz-r78q.onrender.com';
+    return '';
 }
 
 
@@ -144,46 +144,49 @@ function getUserId() {
     return null;
 }
 
-function loadUserBalance() {
+let _initialBalRendered = false;
+
+function setBalUI(val) {
+    userBalance = Number(val) || 0;
+    const formatted = userBalance.toLocaleString('uz-UZ');
+
     const balanceElement = document.getElementById('balance');
+    if (balanceElement) {
+        balanceElement.textContent = formatted;
+    }
+
     const userBalanceStat = document.getElementById('userBalanceStat');
+    if (userBalanceStat) {
+        userBalanceStat.textContent = formatted;
+    }
+
+    document.querySelectorAll('.live-user-balance').forEach(el => {
+        el.textContent = formatted;
+    });
+
+    updateStarsEquivalent(userBalance);
+}
+
+function loadUserBalance() {
     const userId = getUserId();
-
-    const setBalUI = (val) => {
-        userBalance = Number(val) || 0;
-        if (balanceElement) {
-            balanceElement.textContent = userBalance.toLocaleString('uz-UZ');
-        }
-        if (userBalanceStat) {
-            userBalanceStat.textContent = userBalance.toLocaleString('uz-UZ');
-        }
-        updateStarsEquivalent(userBalance);
-    };
-
     if (!userId) {
         setBalUI(0);
         return;
     }
 
-    // 1. Check URL params for instant balance pass from bot
-    let loadedFromUrl = false;
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlBal = urlParams.get('bal') || urlParams.get('balance');
-        if (urlBal !== null && !isNaN(parseInt(urlBal, 10))) {
-            const b = parseInt(urlBal, 10);
-            try { localStorage.setItem('starpay_balance_' + userId, String(b)); } catch(e) {}
-            setBalUI(b);
-            loadedFromUrl = true;
-        }
-    } catch(e) {}
-
-    // 2. Instant optimistic render from localStorage if not loaded from URL
-    if (!loadedFromUrl) {
+    // Initial instant optimistic render (ONLY ONCE ON FIRST LOAD)
+    if (!_initialBalRendered) {
+        _initialBalRendered = true;
         try {
-            const cachedBal = localStorage.getItem('starpay_balance_' + userId);
-            if (cachedBal !== null) {
-                setBalUI(parseInt(cachedBal, 10) || 0);
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlBal = urlParams.get('bal') || urlParams.get('balance');
+            if (urlBal !== null && !isNaN(parseInt(urlBal, 10))) {
+                setBalUI(parseInt(urlBal, 10));
+            } else {
+                const cachedBal = localStorage.getItem('starpay_balance_' + userId);
+                if (cachedBal !== null) {
+                    setBalUI(parseInt(cachedBal, 10) || 0);
+                }
             }
         } catch(e) {}
     }
@@ -200,32 +203,29 @@ function loadUserBalance() {
         }).then(r => r.json());
     };
 
-    fetchBalance(apiBase + '/api/user/balance')
+    fetchBalance((apiBase ? apiBase : '') + '/api/user/balance?t=' + Date.now())
     .then(data => {
         if (data && data.ok && data.balance !== undefined) {
-            userBalance = Number(data.balance);
-            try { localStorage.setItem('starpay_balance_' + userId, String(userBalance)); } catch(e) {}
-            balanceElement.textContent = userBalance.toLocaleString('uz-UZ') + " so'm";
-            updateStarsEquivalent(userBalance);
+            const newBal = Number(data.balance);
+            setBalUI(newBal);
+            try { localStorage.setItem('starpay_balance_' + userId, String(newBal)); } catch(e) {}
         } else if (apiBase !== '') {
-            return fetchBalance('/api/user/balance').then(data2 => {
+            return fetchBalance('/api/user/balance?t=' + Date.now()).then(data2 => {
                 if (data2 && data2.ok && data2.balance !== undefined) {
-                    userBalance = Number(data2.balance);
-                    try { localStorage.setItem('starpay_balance_' + userId, String(userBalance)); } catch(e) {}
-                    balanceElement.textContent = userBalance.toLocaleString('uz-UZ') + " so'm";
-                    updateStarsEquivalent(userBalance);
+                    const newBal = Number(data2.balance);
+                    setBalUI(newBal);
+                    try { localStorage.setItem('starpay_balance_' + userId, String(newBal)); } catch(e) {}
                 }
             });
         }
     })
     .catch(() => {
-        fetchBalance('/api/user/balance')
+        fetchBalance('/api/user/balance?t=' + Date.now())
         .then(data2 => {
             if (data2 && data2.ok && data2.balance !== undefined) {
-                userBalance = Number(data2.balance);
-                try { localStorage.setItem('starpay_balance_' + userId, String(userBalance)); } catch(e) {}
-                balanceElement.textContent = userBalance.toLocaleString('uz-UZ') + " so'm";
-                updateStarsEquivalent(userBalance);
+                const newBal = Number(data2.balance);
+                setBalUI(newBal);
+                try { localStorage.setItem('starpay_balance_' + userId, String(newBal)); } catch(e) {}
             }
         })
         .catch(() => {});

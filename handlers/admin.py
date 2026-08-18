@@ -11,6 +11,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 
 import config
+import keyboards
 import keyboards.admin as admin_kb
 from services.database import (
     add_balance, add_balance_history, deduct_balance, db,
