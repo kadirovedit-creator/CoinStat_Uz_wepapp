@@ -46,8 +46,8 @@ function sendTelegramMessage(botToken, chatId, text) {
 }
 
 function callFragmentApi(endpoint, body) {
-  return new Promise((resolve, reject) => {
-    const apiKey = process.env.FRAGMENT_API_KEY || 'b66c0e21a8b6a2d76c9861550e7c0349c1ece0b2';
+  return new Promise((resolve) => {
+    const apiKey = (process.env.FRAGMENT_API_KEY || 'b66c0e21a8b6a2d76c9861550e7c0349c1ece0b2').trim();
     const payload = JSON.stringify(body);
 
     const options = {
@@ -58,6 +58,7 @@ function callFragmentApi(endpoint, body) {
       headers: {
         'X-API-Key': apiKey,
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Content-Length': Buffer.byteLength(payload),
       },
       timeout: 15000,
@@ -98,7 +99,8 @@ module.exports = async (req, res) => {
   const body = req.body || {};
   let userId = body.telegram_id || body.user_id;
   const username = (body.username || '').replace(/^@/, '').trim();
-  const quantity = parseInt(body.quantity || body.amount, 10);
+  const productType = body.product_type || 'stars';
+  const months = parseInt(body.months, 10);
 
   if (!userId && body.initData) {
     try {
@@ -111,11 +113,44 @@ module.exports = async (req, res) => {
     } catch (e) {}
   }
 
-  if (!userId || !username || isNaN(quantity) || quantity < 50 || quantity > 1000000) {
-    return res.status(400).json({ ok: false, error: "Ma'lumotlar noto'g'ri (min: 50, max: 1 000 000)" });
+  if (!userId) {
+    return res.status(400).json({ ok: false, error: "Telegram ID aniqlanmadi" });
   }
 
-  const price = quantity * 200; // 200 so'm per star
+  // Determine actual Price & Quantity
+  let quantity = 0;
+  let price = 0;
+
+  if (productType.toLowerCase().includes('premium')) {
+    // Premium package
+    price = parseInt(body.amount, 10);
+    if (!price || isNaN(price)) {
+      if (months === 12) price = 380000;
+      else if (months === 6) price = 210000;
+      else price = 135000;
+    }
+    quantity = months || 3;
+  } else if (productType.toLowerCase().includes('nomer')) {
+    // Phone service
+    price = parseInt(body.amount, 10) || 18000;
+    quantity = 1;
+  } else {
+    // Stars package
+    quantity = parseInt(body.quantity, 10) || 50;
+    price = parseInt(body.amount, 10);
+    
+    // If frontend didn't pass exact price, calculate with tiered discount
+    if (!price || isNaN(price)) {
+      if (quantity >= 1000) price = quantity * 190;
+      else if (quantity >= 100) price = quantity * 190;
+      else price = quantity * 200;
+    }
+  }
+
+  if (price <= 0) {
+    return res.status(400).json({ ok: false, error: "Noto'g'ri summa" });
+  }
+
   const botToken = process.env.BOT_TOKEN || '8540635645:AAE3c-NEqdR4F05X_7Vyiq7kP3XD5PmzX7Y';
 
   try {
@@ -130,8 +165,13 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Call Fragment API to send stars
-    const fragRes = await callFragmentApi('stars/buy', { username: username, amount: quantity });
+    // Call Fragment API if relevant
+    let fragRes = null;
+    if (productType.toLowerCase().includes('premium')) {
+      fragRes = await callFragmentApi('premium/buy', { username: username, months: quantity });
+    } else if (!productType.toLowerCase().includes('nomer')) {
+      fragRes = await callFragmentApi('stars/buy', { username: username, amount: quantity });
+    }
 
     // Deduct balance
     const newBal = balance - price;
@@ -140,18 +180,29 @@ module.exports = async (req, res) => {
     // Record order
     const orderRes = await db.query(
       `INSERT INTO orders (telegram_id, product_type, target_username, quantity, amount, status, external_id, created_at)
-       VALUES ($1, 'stars', $2, $3, $4, 'completed', $5, NOW()) RETURNING id`,
-      [userId, username, quantity, price, fragRes?.id ? String(fragRes.id) : null]
+       VALUES ($1, $2, $3, $4, $5, 'completed', $6, NOW()) RETURNING id`,
+      [userId, productType, username, quantity, price, fragRes?.id ? String(fragRes.id) : null]
     );
 
     // Send confirmation message in Telegram Bot
-    const userMsg = 
-      `⭐️ <b>STARS XARID QILINDI!</b>\n\n` +
-      `👤 Qabul qiluvchi: <b>@${username}</b>\n` +
-      `💫 Miqdor: <b>${quantity.toLocaleString('uz-UZ')} Stars</b>\n` +
-      `💰 To'langan: <b>${price.toLocaleString('uz-UZ')} so'm</b>\n` +
-      `👛 Qolgan balans: <b>${newBal.toLocaleString('uz-UZ')} so'm</b>\n\n` +
-      `<i>Xaridingiz uchun rahmat! Stars tez orada hisobingizga tushadi.</i>`;
+    let userMsg = '';
+    if (productType.toLowerCase().includes('premium')) {
+      userMsg = 
+        `👑 <b>TELEGRAM PREMIUM XARID QILINDI!</b>\n\n` +
+        `👤 Qabul qiluvchi: <b>@${username || userId}</b>\n` +
+        `⏳ Muddat: <b>${quantity} Oylik</b>\n` +
+        `💰 To'langan: <b>${price.toLocaleString('uz-UZ')} so'm</b>\n` +
+        `👛 Qolgan balans: <b>${newBal.toLocaleString('uz-UZ')} so'm</b>\n\n` +
+        `<i>Premium tez orada obuna qilinadi!</i>`;
+    } else {
+      userMsg = 
+        `⭐️ <b>STARS XARID QILINDI!</b>\n\n` +
+        `👤 Qabul qiluvchi: <b>@${username || userId}</b>\n` +
+        `💫 Miqdor: <b>${quantity.toLocaleString('uz-UZ')} Stars</b>\n` +
+        `💰 To'langan: <b>${price.toLocaleString('uz-UZ')} so'm</b>\n` +
+        `👛 Qolgan balans: <b>${newBal.toLocaleString('uz-UZ')} so'm</b>\n\n` +
+        `<i>Xaridingiz uchun rahmat! Stars hisobingizga tushadi.</i>`;
+    }
 
     await sendTelegramMessage(botToken, userId, userMsg);
 
@@ -161,7 +212,7 @@ module.exports = async (req, res) => {
       order_id: orderRes.rows[0]?.id,
     });
   } catch (err) {
-    console.error('Order stars error:', err);
+    console.error('Order processing error:', err);
     return res.status(500).json({ ok: false, error: err.message });
   }
 };
