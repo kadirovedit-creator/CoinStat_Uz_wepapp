@@ -1,325 +1,497 @@
 <!DOCTYPE html>
 <html lang="uz">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CoinStat UZ - Reyting</title>
+    <title>CoinStat UZ - Top Reyting</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="css/style.css?v=11.0">
+    <link rel="stylesheet" href="css/style.css?v=12.0">
     <style>
-        .page-header-title-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 6px;
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .page-header-title-box h1 {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-main);
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 16px;
+            padding-bottom: 120px;
+            min-height: 100vh;
         }
 
-        .page-header-subtitle {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .rating-card {
-            background: #111a2c;
-            border: 1px solid #1f2d48;
-            border-radius: 22px;
-            padding: 8px 10px;
-            box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
-            margin-bottom: 20px;
-        }
-
-        .rating-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            gap: 12px;
-            border-radius: 14px;
-            transition: background 0.2s ease;
-        }
-
-        .rating-item:last-child {
-            border-bottom: none;
-        }
-
-        .rating-item:hover {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        .rank {
-            font-size: 18px;
-            font-weight: 800;
-            width: 32px;
-            text-align: center;
+        /* Header */
+        .rating-top-brand {
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
-        .rank.gold {
-            color: #facc15;
-            filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.5));
-        }
-
-        .rank.silver {
-            color: #94a3b8;
-        }
-
-        .rank.bronze {
-            color: #fb923c;
-        }
-
-        .rank.default {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .avatar-slot {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            background: #172133;
-            border: 1.5px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .avatar-circle-img {
-            width: 100%;
-            height: 100%;
+        .rating-top-brand img {
+            width: 22px;
+            height: 22px;
             object-fit: cover;
             border-radius: 50%;
-            display: block;
         }
 
-        .avatar-circle-fallback {
-            width: 100%;
-            height: 100%;
+        .rating-top-brand span {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .rating-page-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 18px;
+        }
+
+        /* Period Tabs */
+        .period-tabs-bar {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #141418;
+            border: 1px solid #222228;
+            border-radius: 999px;
+            padding: 4px;
+            margin-bottom: 20px;
+            justify-content: space-between;
+        }
+
+        .period-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #71717a;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 4px;
+            border-radius: 999px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .period-tab-btn.active {
+            background: #ffffff;
+            color: #000000;
+            font-weight: 800;
+        }
+
+        /* Top 3 Leaderboard Box */
+        .podium-box-container {
+            background: #121316;
+            border: 1px solid #222328;
+            border-radius: 26px;
+            padding: 20px 14px;
+            margin-bottom: 16px;
+        }
+
+        .podium-box-header {
+            text-align: center;
             font-size: 16px;
             font-weight: 800;
             color: #ffffff;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            margin-bottom: 22px;
         }
 
-        .rating-username {
+        .podium-cylinders-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 10px;
+            height: 180px;
+        }
+
+        .podium-column {
+            flex: 1;
+            background: #1c1d22;
+            border: 1px solid #2c2d35;
+            border-radius: 16px 16px 8px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 12px 6px 8px 6px;
+            text-align: center;
+            position: relative;
+        }
+
+        .podium-column.first {
+            height: 100%;
+            background: #23242b;
+            border-color: #3f404d;
+        }
+
+        .podium-column.second {
+            height: 80%;
+        }
+
+        .podium-column.third {
+            height: 70%;
+        }
+
+        .podium-badge-medal {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .podium-username {
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90px;
+            margin-bottom: 4px;
+        }
+
+        .podium-subtext {
+            font-size: 9px;
+            font-weight: 600;
+            color: #71717a;
+            margin-bottom: 2px;
+        }
+
+        .podium-amount {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        /* Leaderboard List Rows */
+        .rating-list-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .leader-row-card {
+            background: #141418;
+            border: 1px solid #222228;
+            border-radius: 18px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .leader-row-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .leader-row-rank {
+            font-size: 13px;
+            font-weight: 700;
+            color: #71717a;
+            width: 24px;
+        }
+
+        .leader-row-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #27272a;
+            flex-shrink: 0;
+        }
+
+        .leader-row-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .leader-row-username {
             font-size: 14px;
             font-weight: 700;
             color: #ffffff;
-            flex: 1;
+            max-width: 130px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .rating-amount {
-            font-size: 14px;
-            font-weight: 800;
-            color: #38bdf8;
-            white-space: nowrap;
+        .leader-row-right {
+            text-align: right;
         }
 
-        .empty-state, .loading-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-size: 14px;
+        .leader-row-turnover-label {
+            font-size: 10px;
             font-weight: 600;
+            color: #71717a;
+            margin-bottom: 2px;
+        }
+
+        .leader-row-turnover-val {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        /* Bottom Sticky User Rank */
+        .user-my-rank-dock {
+            background: #18191e;
+            border: 1px solid #2e2f38;
+            border-radius: 20px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        /* Bottom Minimal Dock Navigation */
+        .bottom-dock-nav {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            background: rgba(18, 19, 22, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .dock-tab-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            border-radius: 18px;
+            color: #71717a;
+            cursor: pointer;
+        }
+
+        .dock-tab-btn.active {
+            color: #ffffff;
         }
     </style>
 </head>
+
 <body>
-    <!-- Loader -->
-    <div class="loader-overlay" id="loaderOverlay">
-        <div class="loader-star">
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <img src="./images/loader.webp" alt="Loader">
-        </div>
-        <div class="loader-text">CoinStat UZ</div>
-        <div class="loader-sub" data-i18n="loader.sub">Yuklanmoqda...</div>
-    </div>
 
-    <!-- Top Profile Header Bar -->
-    <div class="top-header-bar">
-        <div class="top-header-left">
-            <div class="user-avatar-wrap">
-                <img src="./images/logo.png" id="avatarImg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" alt="CoinStat UZ">
-            </div>
-            <div class="user-meta-col">
-                <div class="user-title-name" id="profileName">CoinStat UZ</div>
-                <div class="user-id-row" onclick="copyUserId()" title="Nusxalash">
-                    <span id="profileUserId">ID: —</span>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <button class="lang-pill-btn" onclick="toggleLanguage()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
-            <span data-i18n-lang="profile.lang_">Русский</span>
-            <span style="opacity:0.6; font-size:10px;">v</span>
-        </button>
+    <!-- Top Brand Header -->
+    <div class="rating-top-brand">
+        <img src="./images/logo.png" alt="CoinStat">
+        <span>CoinStat UZ</span>
     </div>
-
-    <!-- Page Title -->
-    <div class="page-header-title-box">
-        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; color: #ffffff;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                <path d="M4 22h16"></path>
-                <path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path>
-                <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path>
-            </svg>
-        </div>
-        <h1 data-i18n="rating.title">Savdo Statistikasi</h1>
-    </div>
-    <div class="page-header-subtitle" data-i18n="rating.subtitle">Eng yaxshi sotuvchilar reytingi</div>
+    <div class="rating-page-title">Top Reyting</div>
 
     <!-- Period Filter Tabs -->
-    <div class="tabs-container" style="margin-bottom: 16px;">
-        <div class="tabs">
-            <button class="tab active" data-period="today" onclick="loadRating('today', this)" data-i18n="rating.tab.today">Bugun</button>
-            <button class="tab" data-period="week" onclick="loadRating('week', this)" data-i18n="rating.tab.week">Shu Hafta</button>
-            <button class="tab" data-period="month" onclick="loadRating('month', this)" data-i18n="rating.tab.month">Shu Oy</button>
-            <button class="tab" data-period="all" onclick="loadRating('all', this)" data-i18n="rating.tab.all">Barcha Vaqt</button>
+    <div class="period-tabs-bar">
+        <button class="period-tab-btn" onclick="switchPeriod('today', this)">Bugun</button>
+        <button class="period-tab-btn active" onclick="switchPeriod('week', this)">Haftalik</button>
+        <button class="period-tab-btn" onclick="switchPeriod('month', this)">Oylik</button>
+        <button class="period-tab-btn" onclick="switchPeriod('all', this)">Barchasi</button>
+    </div>
+
+    <!-- Top 3 Leaderboard Podium -->
+    <div class="podium-box-container">
+        <div class="podium-box-header">Top 3 Leaderboard</div>
+        <div class="podium-cylinders-row">
+            <!-- #2 Second (Left) -->
+            <div class="podium-column second" id="podium2">
+                <div class="podium-badge-medal">🥈 #2</div>
+                <div class="podium-username" id="podiumUser2">@usdt_guru</div>
+                <div class="podium-subtext">Turnover in so'm</div>
+                <div class="podium-amount" id="podiumAmount2">70,000,000 UZS</div>
+            </div>
+
+            <!-- #1 First (Center) -->
+            <div class="podium-column first" id="podium1">
+                <div class="podium-badge-medal">🥇 #1</div>
+                <div class="podium-username" id="podiumUser1">@crypto_king</div>
+                <div class="podium-subtext">Turnover in so'm</div>
+                <div class="podium-amount" id="podiumAmount1">120,500,000 UZS</div>
+            </div>
+
+            <!-- #3 Third (Right) -->
+            <div class="podium-column third" id="podium3">
+                <div class="podium-badge-medal">🥉 #3</div>
+                <div class="podium-username" id="podiumUser3">@coin_master</div>
+                <div class="podium-subtext">Turnover in so'm</div>
+                <div class="podium-amount" id="podiumAmount3">60,800,000 UZS</div>
+            </div>
         </div>
     </div>
 
-    <!-- Rating Leaderboard List -->
-    <div class="rating-card" id="ratingContent">
-        <div class="loading-state" id="ratingLoading" data-i18n="rating.loading">Yuklanmoqda...</div>
+    <!-- Leaderboard List Rows -->
+    <div class="rating-list-wrapper" id="leaderboardList">
+        <!-- Rendered dynamically -->
     </div>
 
-    <!-- Floating Glass Bottom Navigation -->
-    <div class="bottom-nav">
-        <div class="nav-item" onclick="window.location.href='index.html'">
-            <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
-            <div class="nav-label">Asosiy</div>
+    <!-- User My Rank Dock -->
+    <div class="user-my-rank-dock">
+        <div class="leader-row-left">
+            <div class="leader-row-avatar">
+                <img src="./images/logo.png" id="myAvatarImg" alt="User">
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: #ffffff;">
+                Sizning o'rningiz: <span id="myRankNum">#1</span>
+            </div>
         </div>
-        <div class="nav-item" onclick="window.location.href='gift.html'">
-            <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg></div>
-            <div class="nav-label">Gift</div>
+        <div class="leader-row-right">
+            <div class="leader-row-turnover-label">Turnover in so'm</div>
+            <div class="leader-row-turnover-val" id="myTurnoverVal">0 UZS</div>
         </div>
-        <div class="nav-item active" onclick="window.location.href='rating.html'">
-            <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg></div>
-            <div class="nav-label">Top</div>
+    </div>
+
+    <!-- Floating Minimal Dock Navigation -->
+    <div class="bottom-dock-nav">
+        <div class="dock-tab-btn" onclick="window.location.href='index.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         </div>
-        <div class="nav-item" onclick="window.location.href='profile.html'">
-            <div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
-            <div class="nav-label">Profil</div>
+        <div class="dock-tab-btn" onclick="window.location.href='orders.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <div class="dock-tab-btn" onclick="window.location.href='gift.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
+        </div>
+        <div class="dock-tab-btn active" onclick="window.location.href='rating.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg>
+        </div>
+        <div class="dock-tab-btn" onclick="window.location.href='profile.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
     </div>
 
     <script src="js/common.js"></script>
     <script>
-    function loadRating(period, tabEl) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        if (tabEl) tabEl.classList.add('active');
+        function switchPeriod(period, btn) {
+            document.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            loadRatingData(period);
+        }
 
-        const container = document.getElementById('ratingContent');
-        container.innerHTML = '<div class="loading-state">' + (typeof t === 'function' ? t('rating.loading') : 'Yuklanmoqda...') + '</div>';
+        async function loadRatingData(period = 'week') {
+            const apiBase = getApiBase();
+            const currentUserId = String(getUserId() || '');
 
-        fetch(getApiBase() + '/api/rating', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Telegram-Init-Data': tg.initData || '',
-            },
-            body: JSON.stringify({ period: period, initData: tg.initData || '' }),
-        })
-        .then(r => r.json())
-        .then(data => {
-            let ratingList = (data.ok && data.rating && data.rating.length) ? data.rating : [
-                { username: 'StarPay_King', total: 4850000 },
-                { username: 'Uz_Trader', total: 3200000 },
-                { username: 'CryptoUz_Admin', total: 1950000 },
-                { username: 'TelegramStars_Uz', total: 1200000 },
-                { username: 'StarPay_VIP', total: 850000 }
-            ];
+            try {
+                const res = await fetch((apiBase ? apiBase : '') + '/api/rating', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
+                    body: JSON.stringify({ period: period, initData: tg.initData || '' })
+                });
+                const data = await res.json();
+                let list = (data && data.ok && data.rating && data.rating.length) ? data.rating : [
+                    { username: 'crypto_king', total: 120500000 },
+                    { username: 'usdt_guru', total: 70000000 },
+                    { username: 'coin_master', total: 60800000 },
+                    { username: 'trading_pro', total: 45200000 },
+                    { username: 'invest_queen', total: 31100000 },
+                    { username: 'market_wiz', total: 26800000 }
+                ];
 
-            renderLeaderboard(ratingList, container);
-        })
-        .catch(() => {
-            let demoList = [
-                { username: 'StarPay_King', total: 4850000 },
-                { username: 'Uz_Trader', total: 3200000 },
-                { username: 'CryptoUz_Admin', total: 1950000 },
-                { username: 'TelegramStars_Uz', total: 1200000 },
-                { username: 'StarPay_VIP', total: 850000 }
-            ];
-            renderLeaderboard(demoList, container);
-        });
-    }
+                renderPodiumAndList(list, currentUserId);
+            } catch (err) {
+                let demoList = [
+                    { username: 'crypto_king', total: 120500000 },
+                    { username: 'usdt_guru', total: 70000000 },
+                    { username: 'coin_master', total: 60800000 },
+                    { username: 'trading_pro', total: 45200000 },
+                    { username: 'invest_queen', total: 31100000 },
+                    { username: 'market_wiz', total: 26800000 }
+                ];
+                renderPodiumAndList(demoList, currentUserId);
+            }
+        }
 
-    function renderLeaderboard(list, container) {
-        let html = '';
-        const currentUserId = String(tg.initDataUnsafe?.user?.id || '');
-        const currentUserPhoto = tg.initDataUnsafe?.user?.photo_url || '';
-
-        list.forEach((item, i) => {
-            const rank = i + 1;
-            let rankBadge = '#' + rank;
-            let rankClass = 'default';
-            if (rank === 1) { rankClass = 'gold'; rankBadge = '🥇'; }
-            else if (rank === 2) { rankClass = 'silver'; rankBadge = '🥈'; }
-            else if (rank === 3) { rankClass = 'bronze'; rankBadge = '🥉'; }
-
-            const firstLetter = (item.username || 'U')[0].toUpperCase();
-            const username = item.username ? '@' + item.username : 'User#' + (item.telegram_id || '100');
-            const total = (item.total || 0).toLocaleString('uz-UZ') + " so'm";
-
-            let photoUrl = item.photo_url || item.avatar_url || '';
-            if (!photoUrl && String(item.telegram_id) === currentUserId && currentUserPhoto) {
-                photoUrl = currentUserPhoto;
+        function renderPodiumAndList(list, currentUserId) {
+            // #1
+            if (list[0]) {
+                document.getElementById('podiumUser1').textContent = '@' + (list[0].username || 'User#1');
+                document.getElementById('podiumAmount1').textContent = Number(list[0].total || 0).toLocaleString('uz-UZ') + ' UZS';
+            }
+            // #2
+            if (list[1]) {
+                document.getElementById('podiumUser2').textContent = '@' + (list[1].username || 'User#2');
+                document.getElementById('podiumAmount2').textContent = Number(list[1].total || 0).toLocaleString('uz-UZ') + ' UZS';
+            }
+            // #3
+            if (list[2]) {
+                document.getElementById('podiumUser3').textContent = '@' + (list[2].username || 'User#3');
+                document.getElementById('podiumAmount3').textContent = Number(list[2].total || 0).toLocaleString('uz-UZ') + ' UZS';
             }
 
-            let avatarHtml = '';
-            if (photoUrl) {
-                avatarHtml = `<img src="${photoUrl}" class="avatar-circle-img" alt="${username}" onerror="this.outerHTML='<div class=\\'avatar-circle-fallback\\'>${firstLetter}</div>'">`;
-            } else {
-                avatarHtml = `<img src="./images/logo.png" class="avatar-circle-img" alt="${username}">`;
+            // Remaining list rows (from #4 onwards)
+            const container = document.getElementById('leaderboardList');
+            let html = '';
+            let myRank = null;
+            let myTurnover = 0;
+
+            list.forEach((item, i) => {
+                const rank = i + 1;
+                const uname = item.username ? '@' + item.username : 'User#' + (item.telegram_id || (i + 1));
+                const totalFormatted = Number(item.total || 0).toLocaleString('uz-UZ') + ' UZS';
+
+                if (String(item.telegram_id) === currentUserId || (tg.initDataUnsafe?.user?.username && item.username === tg.initDataUnsafe.user.username)) {
+                    myRank = rank;
+                    myTurnover = item.total || 0;
+                }
+
+                if (rank > 3) {
+                    html += `
+                        <div class="leader-row-card">
+                            <div class="leader-row-left">
+                                <div class="leader-row-rank">#${rank}</div>
+                                <div class="leader-row-avatar">
+                                    <img src="./images/logo.png" alt="${uname}">
+                                </div>
+                                <div class="leader-row-username">${uname}</div>
+                            </div>
+                            <div class="leader-row-right">
+                                <div class="leader-row-turnover-label">Turnover in so'm</div>
+                                <div class="leader-row-turnover-val">${totalFormatted}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+
+            const myRankEl = document.getElementById('myRankNum');
+            const myTurnoverEl = document.getElementById('myTurnoverVal');
+            if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '#1';
+            if (myTurnoverEl) myTurnoverEl.textContent = myTurnover ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
+
+            if (tg.initDataUnsafe?.user?.photo_url) {
+                const myAv = document.getElementById('myAvatarImg');
+                if (myAv) myAv.src = tg.initDataUnsafe.user.photo_url;
             }
+        }
 
-            html += `
-                <div class="rating-item">
-                    <div class="rank ${rankClass}">${rankBadge}</div>
-                    <div class="avatar-slot">${avatarHtml}</div>
-                    <div class="rating-username">${username}</div>
-                    <div class="rating-amount">${total}</div>
-                </div>
-            `;
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRatingData('week');
         });
-
-        container.innerHTML = html;
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const firstTab = document.querySelector('.tab');
-        loadRating('today', firstTab);
-    });
     </script>
 </body>
+
 </html>

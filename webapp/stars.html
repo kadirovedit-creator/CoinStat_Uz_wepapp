@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CoinStat UZ - Telegram Stars</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="css/style.css?v=11.0">
+    <link rel="stylesheet" href="css/style.css?v=12.0">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -19,101 +19,140 @@
         }
 
         body {
-            background-color: #0b111d;
+            background-color: #000000;
             color: #ffffff;
             padding: 16px;
-            padding-bottom: 120px;
+            padding-bottom: 110px;
             min-height: 100vh;
         }
 
-        /* Top Header Bar */
-        .stars-header {
+        /* Header */
+        .stars-top-bar {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 16px;
+            justify-content: space-between;
             margin-bottom: 24px;
-            margin-top: 4px;
+            padding: 4px 0;
         }
 
-        .back-btn-circle {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #172133;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .back-pill-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #141418;
+            border: 1px solid #222228;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
             cursor: pointer;
             transition: all 0.2s ease;
-            flex-shrink: 0;
         }
 
-        .back-btn-circle:active {
+        .back-pill-btn:active {
             transform: scale(0.92);
-            background: #1e2c44;
         }
 
-        .header-title-box {
+        .stars-page-heading {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+        }
+
+        .balance-badge-pill {
+            background: #141418;
+            border: 1px solid #222228;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 999px;
+        }
+
+        /* 2x2 Star Cards Grid */
+        .stars-2x2-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .star-2x2-card {
+            background: #141418;
+            border: 1px solid #222228;
+            border-radius: 22px;
+            padding: 18px 14px;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            min-height: 155px;
+            user-select: none;
         }
 
-        .header-logo-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: #252b48;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        .discount-pill {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #27272a;
+            color: #a1a1aa;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 999px;
         }
 
-        .header-logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .header-title-text {
+        .star-quantity-row {
             font-size: 20px;
             font-weight: 800;
             color: #ffffff;
-            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
         }
 
-        /* Recipient Input Bar */
-        .recipient-bar {
-            background: #111a2c;
-            border: 1px solid #1f2d48;
+        .star-price-row {
+            font-size: 14px;
+            font-weight: 700;
+            color: #a1a1aa;
+            margin-bottom: 14px;
+        }
+
+        .star-buy-button {
+            width: 100%;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .star-buy-button:active {
+            transform: scale(0.96);
+            background: #e4e4e7;
+        }
+
+        /* Recipient Input */
+        .recipient-dark-bar {
+            background: #141418;
+            border: 1px solid #222228;
             border-radius: 18px;
-            padding: 6px 8px 6px 16px;
+            padding: 16px 18px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
 
-        .recipient-input-wrap {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex: 1;
-        }
-
-        .recipient-at {
-            color: #64748b;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .recipient-input {
+        .recipient-dark-input {
             background: transparent;
             border: none;
             outline: none;
@@ -123,224 +162,51 @@
             width: 100%;
         }
 
-        .recipient-input::placeholder {
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 500;
+        .recipient-dark-input::placeholder {
+            color: #52525b;
         }
 
-        .for-myself-btn {
-            background: #2563eb;
+        .for-me-pill {
+            background: #27272a;
             color: #ffffff;
             border: none;
-            outline: none;
-            padding: 10px 18px;
-            border-radius: 14px;
-            font-size: 14px;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
         }
 
-        .for-myself-btn:active {
-            transform: scale(0.94);
-            background: #1d4ed8;
-        }
-
-        /* Stars Tier List (Exact Match to Screenshot) */
-        .stars-list-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .star-tier-row {
-            background: #111a2c;
-            border: 1px solid #1f2d48;
-            border-radius: 20px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            user-select: none;
-        }
-
-        .star-tier-row:hover {
-            border-color: rgba(234, 179, 8, 0.4);
-            background: #141f35;
-        }
-
-        .star-tier-row.selected {
-            background: #19202c;
-            border: 1.5px solid #eab308 !important;
-            box-shadow: 0 0 20px rgba(234, 179, 8, 0.15);
-        }
-
-        .star-icon-box {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .star-icon-box img {
-            width: 38px;
-            height: 38px;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 10px rgba(234, 179, 8, 0.35));
-        }
-
-        .star-tier-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .star-tier-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-
-        .star-tier-price {
-            font-size: 13px;
-            font-weight: 600;
-            color: #94a3b8;
-        }
-
-        /* Custom Amount Button Card */
-        .custom-tier-row {
-            background: #111a2c;
-            border: 1px solid #1f2d48;
-            border-radius: 20px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .custom-tier-row:hover {
-            background: #141f35;
-            border-color: #334155;
-        }
-
-        .custom-tier-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .custom-plus-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #1e293b;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .custom-tier-arrow {
-            color: #64748b;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        /* Custom Input Expand Drawer */
-        .custom-input-drawer {
-            display: none;
-            background: #111a2c;
-            border: 1px solid #2563eb;
-            border-radius: 18px;
-            padding: 14px 16px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-
-        .custom-input-drawer.open {
-            display: block;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .custom-field-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .custom-stars-input {
-            background: #172133;
-            border: 1px solid #1f2d48;
-            border-radius: 12px;
-            padding: 10px 14px;
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 700;
-            width: 100%;
-            outline: none;
-        }
-
-        .custom-stars-input:focus {
-            border-color: #2563eb;
-        }
-
-        /* Floating Big Bottom Action Bar */
-        .stars-bottom-action {
+        /* Bottom Minimal Dock Navigation */
+        .bottom-dock-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(180deg, transparent 0%, #0b111d 30%, #0b111d 100%);
-            padding: 16px;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            background: rgba(18, 19, 22, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            backdrop-filter: blur(20px);
             z-index: 100;
         }
 
-        .stars-buy-btn {
-            width: 100%;
-            background: #2563eb;
-            color: #ffffff;
-            border: none;
-            border-radius: 20px;
-            padding: 18px;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+        .dock-tab-btn {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 18px;
+            color: #71717a;
+            cursor: pointer;
         }
 
-        .stars-buy-btn:hover {
-            background: #1d4ed8;
-        }
-
-        .stars-buy-btn:active {
-            transform: scale(0.98);
-        }
-
-        .stars-buy-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
+        .dock-tab-btn.active {
+            color: #ffffff;
         }
     </style>
 </head>
@@ -348,124 +214,84 @@
 <body>
 
     <!-- Header -->
-    <div class="stars-header">
-        <div class="back-btn-circle" onclick="window.location.href='index.html'">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
+    <div class="stars-top-bar">
+        <div class="back-pill-btn" onclick="window.location.href='index.html'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
         </div>
-        <div class="header-title-box">
-            <div class="header-logo-icon">
-                <img src="./images/star.webp" alt="Stars">
-            </div>
-            <div class="header-title-text">Telegram Stars</div>
+        <div class="balance-badge-pill">
+            <span id="balance">0</span> UZS
         </div>
     </div>
 
-    <!-- Recipient Input Bar -->
-    <div class="recipient-bar">
-        <div class="recipient-input-wrap">
-            <span class="recipient-at">@</span>
-            <input type="text" id="username" class="recipient-input" placeholder="Foydalanuvchi nomi">
-        </div>
-        <button type="button" class="for-myself-btn" onclick="setMyUsername()">O'zimga</button>
-    </div>
+    <div class="stars-page-heading">Telegram Stars</div>
 
-    <!-- Stars Tier Selection List -->
-    <div class="stars-list-stack">
-        <!-- 50 Stars (Default Selected) -->
-        <div class="star-tier-row selected" onclick="selectTier(50, 9500, this)">
-            <div class="star-icon-box">
-                <img src="./images/star.webp" alt="50 Stars">
+    <!-- 2x2 Stars Grid -->
+    <div class="stars-2x2-grid">
+        <!-- 50 Stars -->
+        <div class="star-2x2-card">
+            <div>
+                <div class="star-quantity-row">50 ★</div>
+                <div class="star-price-row">9 500 UZS</div>
             </div>
-            <div class="star-tier-meta">
-                <div class="star-tier-title">50 Stars</div>
-                <div class="star-tier-price">9 500 so'm</div>
-            </div>
+            <button class="star-buy-button" onclick="buyStarTier(50, 9500, this)">Sotib olish</button>
         </div>
 
         <!-- 100 Stars -->
-        <div class="star-tier-row" onclick="selectTier(100, 19000, this)">
-            <div class="star-icon-box">
-                <img src="./images/star.webp" alt="100 Stars">
+        <div class="star-2x2-card">
+            <div class="discount-pill">-15%</div>
+            <div>
+                <div class="star-quantity-row">100 ★</div>
+                <div class="star-price-row">19 000 UZS</div>
             </div>
-            <div class="star-tier-meta">
-                <div class="star-tier-title">100 Stars</div>
-                <div class="star-tier-price">19 000 so'm</div>
-            </div>
-        </div>
-
-        <!-- 150 Stars -->
-        <div class="star-tier-row" onclick="selectTier(150, 28500, this)">
-            <div class="star-icon-box">
-                <img src="./images/star.webp" alt="150 Stars">
-            </div>
-            <div class="star-tier-meta">
-                <div class="star-tier-title">150 Stars</div>
-                <div class="star-tier-price">28 500 so'm</div>
-            </div>
-        </div>
-
-        <!-- 250 Stars -->
-        <div class="star-tier-row" onclick="selectTier(250, 47500, this)">
-            <div class="star-icon-box">
-                <img src="./images/star.webp" alt="250 Stars">
-            </div>
-            <div class="star-tier-meta">
-                <div class="star-tier-title">250 Stars</div>
-                <div class="star-tier-price">47 500 so'm</div>
-            </div>
+            <button class="star-buy-button" onclick="buyStarTier(100, 19000, this)">Sotib olish</button>
         </div>
 
         <!-- 500 Stars -->
-        <div class="star-tier-row" onclick="selectTier(500, 95000, this)">
-            <div class="star-icon-box">
-                <img src="./images/star.webp" alt="500 Stars">
+        <div class="star-2x2-card">
+            <div class="discount-pill">-15%</div>
+            <div>
+                <div class="star-quantity-row">500 ★</div>
+                <div class="star-price-row">95 000 UZS</div>
             </div>
-            <div class="star-tier-meta">
-                <div class="star-tier-title">500 Stars</div>
-                <div class="star-tier-price">95 000 so'm</div>
-            </div>
+            <button class="star-buy-button" onclick="buyStarTier(500, 95000, this)">Sotib olish</button>
         </div>
 
         <!-- 1000 Stars -->
-        <div class="star-tier-row" onclick="selectTier(1000, 190000, this)">
-            <div class="star-icon-box">
-                <img src="./images/star.webp" alt="1000 Stars">
+        <div class="star-2x2-card">
+            <div class="discount-pill">-15%</div>
+            <div>
+                <div class="star-quantity-row">1 000 ★</div>
+                <div class="star-price-row">190 000 UZS</div>
             </div>
-            <div class="star-tier-meta">
-                <div class="star-tier-title">1 000 Stars</div>
-                <div class="star-tier-price">190 000 so'm</div>
-            </div>
-        </div>
-
-        <!-- Custom Amount Trigger -->
-        <div class="custom-tier-row" onclick="toggleCustomDrawer()">
-            <div class="custom-tier-left">
-                <div class="custom-plus-circle">+</div>
-                <div class="star-tier-meta">
-                    <div class="star-tier-title">Boshqa qiymat kiritish</div>
-                    <div class="star-tier-price">50 dan 100 000 gacha</div>
-                </div>
-            </div>
-            <div class="custom-tier-arrow">&rsaquo;</div>
-        </div>
-
-        <!-- Custom Input Drawer -->
-        <div class="custom-input-drawer" id="customDrawer">
-            <div class="custom-field-row">
-                <input type="number" id="customStarsInput" class="custom-stars-input" placeholder="Miqdorni kiriting (min 50)" min="50" max="100000" oninput="onCustomInput(this.value)">
-            </div>
-            <div id="customPriceLabel" style="font-size: 13px; color: #38bdf8; font-weight: 700; margin-top: 8px;">Narx: 0 so'm</div>
+            <button class="star-buy-button" onclick="buyStarTier(1000, 190000, this)">Sotib olish</button>
         </div>
     </div>
 
-    <!-- Bottom Purchase Bar -->
-    <div class="stars-bottom-action">
-        <button type="button" class="stars-buy-btn" id="buyBtn" onclick="executeBuyStars()">
-            <span>Sotib olish</span>
-        </button>
+    <!-- Recipient Input -->
+    <div class="recipient-dark-bar">
+        <input type="text" id="username" class="recipient-dark-input" placeholder="@username">
+        <button class="for-me-pill" onclick="setMyUsername()">O'zimga</button>
+    </div>
+
+    <!-- Floating Minimal Dock Navigation -->
+    <div class="bottom-dock-nav">
+        <div class="dock-tab-btn" onclick="window.location.href='index.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </div>
+        <div class="dock-tab-btn" onclick="window.location.href='orders.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <div class="dock-tab-btn" onclick="window.location.href='gift.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
+        </div>
+        <div class="dock-tab-btn" onclick="window.location.href='rating.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg>
+        </div>
+        <div class="dock-tab-btn" onclick="window.location.href='profile.html'">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
     </div>
 
     <script src="js/common.js"></script>
@@ -473,59 +299,17 @@
         const tg = window.Telegram?.WebApp || {};
         try { tg.expand?.(); tg.ready?.(); } catch (e) {}
 
-        let selectedStars = 50;
-        let selectedPrice = 9500;
-        const STAR_UNIT_PRICE = 190; // 190 so'm per star (50 = 9 500 so'm)
-
         function setMyUsername() {
             const user = tg.initDataUnsafe?.user;
             const input = document.getElementById('username');
             if (input) {
-                if (user && user.username) {
-                    input.value = user.username;
-                } else if (user && user.id) {
-                    input.value = user.id;
-                } else {
-                    input.value = 'men';
-                }
+                if (user && user.username) input.value = '@' + user.username;
+                else if (user && user.id) input.value = user.id;
+                else input.value = '@men';
             }
         }
 
-        function selectTier(stars, price, el) {
-            selectedStars = stars;
-            selectedPrice = price;
-
-            document.querySelectorAll('.star-tier-row').forEach(row => row.classList.remove('selected'));
-            if (el) el.classList.add('selected');
-
-            document.getElementById('customDrawer').classList.remove('open');
-            document.getElementById('customStarsInput').value = '';
-        }
-
-        function toggleCustomDrawer() {
-            const drawer = document.getElementById('customDrawer');
-            drawer.classList.toggle('open');
-            if (drawer.classList.contains('open')) {
-                document.querySelectorAll('.star-tier-row').forEach(row => row.classList.remove('selected'));
-                document.getElementById('customStarsInput').focus();
-            }
-        }
-
-        function onCustomInput(val) {
-            const num = parseInt(val, 10);
-            const priceLabel = document.getElementById('customPriceLabel');
-            if (!isNaN(num) && num >= 50) {
-                selectedStars = num;
-                selectedPrice = num * STAR_UNIT_PRICE;
-                priceLabel.textContent = `Narx: ${selectedPrice.toLocaleString('uz-UZ')} so'm`;
-            } else {
-                selectedStars = 0;
-                selectedPrice = 0;
-                priceLabel.textContent = 'Minimal: 50 stars';
-            }
-        }
-
-        async function executeBuyStars() {
+        async function buyStarTier(qty, price, btn) {
             let uVal = (document.getElementById('username')?.value || '').trim().replace(/^@/, '');
             if (!uVal) {
                 const tgUser = tg.initDataUnsafe?.user;
@@ -538,15 +322,9 @@
                 return;
             }
 
-            if (!selectedStars || selectedStars < 50) {
-                if (tg.showAlert) tg.showAlert('Minimal stars miqdori: 50 ta!');
-                else alert('Minimal stars miqdori: 50 ta!');
-                return;
-            }
-
-            const btn = document.getElementById('buyBtn');
+            const oldText = btn.textContent;
             btn.disabled = true;
-            btn.innerHTML = '<span>⏳ Yuborilmoqda...</span>';
+            btn.textContent = '⏳ ...';
 
             const userId = getUserId();
             const apiBase = getApiBase();
@@ -554,40 +332,32 @@
             try {
                 const res = await fetch((apiBase ? apiBase : '') + '/api/order/stars', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Telegram-Init-Data': tg.initData || '',
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
                     body: JSON.stringify({
                         telegram_id: userId,
                         username: uVal,
-                        quantity: selectedStars,
-                        amount: selectedPrice,
+                        quantity: qty,
+                        amount: price,
                         initData: tg.initData || ''
                     })
                 });
 
                 const data = await res.json();
                 if (data && data.ok) {
-                    if (tg.showAlert) {
-                        tg.showAlert(`✅ ${selectedStars} Stars muvaffaqiyatli xarid qilindi!`);
-                    } else {
-                        alert(`✅ ${selectedStars} Stars muvaffaqiyatli xarid qilindi!`);
-                    }
-                    setTimeout(() => {
-                        window.location.href = 'orders.html';
-                    }, 1000);
+                    if (tg.showAlert) tg.showAlert(`✅ ${qty} Stars muvaffaqiyatli xarid qilindi!`);
+                    else alert(`✅ ${qty} Stars muvaffaqiyatli xarid qilindi!`);
+                    setTimeout(() => window.location.href = 'orders.html', 1000);
                 } else {
-                    const err = data?.error || 'Xaridni amalga oshirishda xatolik yuz berdi.';
+                    const err = data?.error || 'Xaridda xatolik yuz berdi.';
                     if (tg.showAlert) tg.showAlert(err);
                     else alert(err);
                 }
             } catch (err) {
-                if (tg.showAlert) tg.showAlert('Serverga ulanishda xatolik yuz berdi: ' + err.message);
-                else alert('Serverga ulanishda xatolik yuz berdi: ' + err.message);
+                if (tg.showAlert) tg.showAlert('Serverga ulanishda xatolik: ' + err.message);
+                else alert('Serverga ulanishda xatolik: ' + err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<span>Sotib olish</span>';
+                btn.textContent = oldText;
             }
         }
 
