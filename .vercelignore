@@ -1,0 +1,11 @@
+api/
+bot/
+admin/
+handlers/
+keyboards/
+services/
+humopay-api/
+alembic/
+*.py
+*.pem
+*.db
