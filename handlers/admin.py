@@ -1376,15 +1376,15 @@ async def _confirm_locally(message: Message, order_id: str):
 # 15. TOPUP APPROVAL & REJECTION CALLBACKS
 # ═══════════════════════════════════════════
 
+_processing_orders = set()
+
 @router.callback_query(F.data.startswith("approve_topup_") | F.data.startswith("admin_approve_"))
 async def admin_approve_topup_cb(callback: CallbackQuery):
     if not _is_admin(callback.from_user.id):
         await callback.answer("❌ Faqat adminlar uchun!", show_alert=True)
         return
 
-    await callback.answer("⏳ To'lov tasdiqlanmoqda...")
     data = callback.data
-
     user_id = None
     amount = None
     order_id = None
@@ -1423,52 +1423,83 @@ async def admin_approve_topup_cb(callback: CallbackQuery):
 
     if not user_id or not amount:
         logger.error("Failed to parse approve callback data: %s", data)
-        await callback.message.reply("❌ Buyurtma ma'lumotlarini aniqlab bo'lmadi!")
+        await callback.answer("❌ Buyurtma ma'lumotlarini aniqlab bo'lmadi!", show_alert=True)
         return
 
+    lock_key = str(order_id) if order_id else f"{user_id}_{amount}"
+    if lock_key in _processing_orders:
+        await callback.answer("⚠️ Ushbu to'lov allaqachon tasdiqlanmoqda yoki tasdiqlangan!", show_alert=True)
+        return
+
+    # Check database status
     if order_id:
-        await db.update_order(order_id, status="completed")
+        existing_order = await db.get_order(order_id)
+        if existing_order and existing_order.get("status") in ("completed", "paid"):
+            await callback.answer("⚠️ Ushbu to'lov allaqachon tasdiqlangan!", show_alert=True)
+            try:
+                await callback.message.edit_reply_markup(reply_markup=None)
+            except Exception:
+                pass
+            return
+        elif existing_order and existing_order.get("status") in ("rejected", "cancelled"):
+            await callback.answer("⚠️ Ushbu to'lov allaqachon rad etilgan!", show_alert=True)
+            try:
+                await callback.message.edit_reply_markup(reply_markup=None)
+            except Exception:
+                pass
+            return
 
-    new_balance = await add_balance(user_id, amount)
-    await add_balance_history(user_id, amount, "topup", new_balance - amount, new_balance,
-                              f"Admin to'lovni tasdiqladi: #{order_id}", callback.from_user.id)
-    await record_payment(str(order_id), user_id, amount, "paid",
-                          f'{{"source": "admin_approval_button", "admin_id": {callback.from_user.id}}}')
+    _processing_orders.add(lock_key)
+    await callback.answer("⏳ To'lov tasdiqlanmoqda...")
 
-    # Notify user
     try:
-        user_text = (
-            f"✅ <b>To'lovingiz muvaffaqiyatli tasdiqlandi!</b>\n\n"
-            f"💰 Qo'shildi: <b>+{amount:,} so'm</b>\n"
-            f"👛 Yangi balansingiz: <b>{new_balance:,} so'm</b>\n\n"
-            f"<i>Xaridingiz uchun rahmat! Xizmatlardan foydalanishingiz mumkin.</i>"
-        )
-        await callback.bot.send_message(
-            user_id,
-            user_text,
-            reply_markup=keyboards.get_webapp_main_keyboard(user_id, balance=new_balance),
-            parse_mode="HTML"
-        )
-    except Exception as ex:
-        logger.warning("Could not notify user %s: %s", user_id, ex)
+        if order_id:
+            await db.update_order(order_id, status="completed")
 
-    # Edit admin message
-    try:
-        updated_text = (
-            f"✅ <b>TO'LOV TASDIQLANDI!</b>\n\n"
-            f"👤 Foydalanuvchi ID: <code>{user_id}</code>\n"
-            f"💰 Summa: <b>+{amount:,} so'm</b>\n"
-            f"💳 Yangi balans: <b>{new_balance:,} so'm</b>\n"
-            f"🆔 Buyurtma: <code>{order_id}</code>\n"
-            f"👨‍💻 Tasdiqladi: @{callback.from_user.username or callback.from_user.id}\n\n"
-            f"<i>Foydalanuvchi hisobiga pul qo'shildi va xabar yuborildi.</i>"
-        )
-        if callback.message.photo or callback.message.document:
-            await callback.message.edit_caption(caption=updated_text, parse_mode="HTML")
-        else:
-            await callback.message.edit_text(updated_text, parse_mode="HTML")
-    except Exception:
-        await callback.message.reply(f"✅ To'lov tasdiqlandi! (+{amount:,} so'm)")
+        new_balance = await add_balance(user_id, amount)
+        await add_balance_history(user_id, amount, "topup", new_balance - amount, new_balance,
+                                  f"Admin to'lovni tasdiqladi: #{order_id}", callback.from_user.id)
+        await record_payment(str(order_id), user_id, amount, "paid",
+                              f'{{"source": "admin_approval_button", "admin_id": {callback.from_user.id}}}')
+
+        # Notify user
+        try:
+            user_text = (
+                f"✅ <b>To'lovingiz muvaffaqiyatli tasdiqlandi!</b>\n\n"
+                f"💰 Qo'shildi: <b>+{amount:,} so'm</b>\n"
+                f"👛 Yangi balansingiz: <b>{new_balance:,} so'm</b>\n\n"
+                f"<i>Xaridingiz uchun rahmat! Xizmatlardan foydalanishingiz mumkin.</i>"
+            )
+            await callback.bot.send_message(
+                user_id,
+                user_text,
+                reply_markup=keyboards.get_webapp_main_keyboard(user_id, balance=new_balance),
+                parse_mode="HTML"
+            )
+        except Exception as ex:
+            logger.warning("Could not notify user %s: %s", user_id, ex)
+
+        # Edit admin message
+        try:
+            updated_text = (
+                f"✅ <b>TO'LOV TASDIQLANDI!</b>\n\n"
+                f"👤 Foydalanuvchi ID: <code>{user_id}</code>\n"
+                f"💰 Summa: <b>+{amount:,} so'm</b>\n"
+                f"💳 Yangi balans: <b>{new_balance:,} so'm</b>\n"
+                f"🆔 Buyurtma: <code>{order_id}</code>\n"
+                f"👨‍💻 Tasdiqladi: @{callback.from_user.username or callback.from_user.id}\n\n"
+                f"<i>Foydalanuvchi hisobiga pul qo'shildi va xabar yuborildi.</i>"
+            )
+            if callback.message.photo or callback.message.document:
+                await callback.message.edit_caption(caption=updated_text, parse_mode="HTML", reply_markup=None)
+            else:
+                await callback.message.edit_text(updated_text, parse_mode="HTML", reply_markup=None)
+        except Exception:
+            await callback.message.reply(f"✅ To'lov tasdiqlandi! (+{amount:,} so'm)")
+    except Exception as e:
+        logger.error("Error in admin_approve_topup_cb: %s", e)
+        if lock_key in _processing_orders:
+            _processing_orders.remove(lock_key)
 
 
 @router.callback_query(F.data.startswith("reject_topup_") | F.data.startswith("admin_reject_"))
@@ -1477,9 +1508,7 @@ async def admin_reject_topup_cb(callback: CallbackQuery):
         await callback.answer("❌ Faqat adminlar uchun!", show_alert=True)
         return
 
-    await callback.answer("❌ To'lov rad etildi.")
     data = callback.data
-
     user_id = None
     order_id = None
 
@@ -1498,6 +1527,24 @@ async def admin_reject_topup_cb(callback: CallbackQuery):
             order = await db.get_order(order_id)
             if order:
                 user_id = order.get("telegram_id")
+
+    lock_key = str(order_id) if order_id else f"reject_{user_id}"
+    if lock_key in _processing_orders:
+        await callback.answer("⚠️ Ushbu so'rov allaqachon ko'rib chiqilgan!", show_alert=True)
+        return
+
+    if order_id:
+        existing_order = await db.get_order(order_id)
+        if existing_order and existing_order.get("status") in ("completed", "paid", "rejected", "cancelled"):
+            await callback.answer("⚠️ Ushbu so'rov allaqachon ko'rib chiqilgan!", show_alert=True)
+            try:
+                await callback.message.edit_reply_markup(reply_markup=None)
+            except Exception:
+                pass
+            return
+
+    _processing_orders.add(lock_key)
+    await callback.answer("❌ To'lov rad etildi.")
 
     if order_id:
         await db.update_order(order_id, status="rejected")
@@ -1521,9 +1568,9 @@ async def admin_reject_topup_cb(callback: CallbackQuery):
             f"👨‍💻 Rad etdi: @{callback.from_user.username or callback.from_user.id}"
         )
         if callback.message.photo or callback.message.document:
-            await callback.message.edit_caption(caption=updated_text, parse_mode="HTML")
+            await callback.message.edit_caption(caption=updated_text, parse_mode="HTML", reply_markup=None)
         else:
-            await callback.message.edit_text(updated_text, parse_mode="HTML")
+            await callback.message.edit_text(updated_text, parse_mode="HTML", reply_markup=None)
     except Exception:
         await callback.message.reply("❌ To'lov so'rovi rad etildi.")
 
