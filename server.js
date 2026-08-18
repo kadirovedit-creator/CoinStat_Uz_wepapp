@@ -275,6 +275,19 @@ app.all('/api/order/stars', (req, res) => starsOrderHandler(req, res));
 app.all('/api/order/topup', (req, res) => topupOrderHandler(req, res));
 app.all('/api/order/gift', (req, res) => giftOrderHandler(req, res));
 
+// Fresh reset endpoint: reset all users balance to 0 and clear orders/rating
+app.all('/api/admin/reset-fresh', async (req, res) => {
+  try {
+    await pool.query('UPDATE users SET balance = 0');
+    try { await pool.query('DELETE FROM orders'); } catch (e) {}
+    try { await pool.query('DELETE FROM balance_history'); } catch (e) {}
+    try { await pool.query('DELETE FROM transactions'); } catch (e) {}
+    return res.json({ ok: true, message: 'All balances, orders and leaderboard reset to 0!' });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // 5. Serve static WebApp files
 app.use(express.static(path.join(__dirname)));
 app.use('/webapp', express.static(path.join(__dirname, 'webapp')));
@@ -285,10 +298,21 @@ app.get('/', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`========================================`);
   console.log(`🚀 CoinStatUz Node.js Server is RUNNING!`);
   console.log(`📡 URL: http://localhost:${PORT}`);
   console.log(`⚡ PostgreSQL connected to NeonDB`);
   console.log(`========================================`);
+
+  // Perform database fresh reset on launch
+  try {
+    const r1 = await pool.query('UPDATE users SET balance = 0');
+    try { await pool.query('DELETE FROM orders'); } catch (e) {}
+    try { await pool.query('DELETE FROM balance_history'); } catch (e) {}
+    try { await pool.query('DELETE FROM transactions'); } catch (e) {}
+    console.log(`✨ Fresh database reset: ${r1.rowCount} users reset to 0 balance, orders & rating reset to 0!`);
+  } catch (e) {
+    console.error('Initial reset error:', e.message);
+  }
 });
