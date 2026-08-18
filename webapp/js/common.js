@@ -143,12 +143,22 @@ function getUserId() {
 
 function loadUserBalance() {
     const balanceElement = document.getElementById('balance');
-    if (!balanceElement) return;
-
+    const userBalanceStat = document.getElementById('userBalanceStat');
     const userId = getUserId();
+
+    const setBalUI = (val) => {
+        userBalance = Number(val) || 0;
+        if (balanceElement) {
+            balanceElement.textContent = userBalance.toLocaleString('uz-UZ');
+        }
+        if (userBalanceStat) {
+            userBalanceStat.textContent = userBalance.toLocaleString('uz-UZ');
+        }
+        updateStarsEquivalent(userBalance);
+    };
+
     if (!userId) {
-        balanceElement.textContent = "0 so'm";
-        updateStarsEquivalent(0);
+        setBalUI(0);
         return;
     }
 
@@ -158,10 +168,9 @@ function loadUserBalance() {
         const urlParams = new URLSearchParams(window.location.search);
         const urlBal = urlParams.get('bal') || urlParams.get('balance');
         if (urlBal !== null && !isNaN(parseInt(urlBal, 10))) {
-            userBalance = parseInt(urlBal, 10);
-            try { localStorage.setItem('starpay_balance_' + userId, String(userBalance)); } catch(e) {}
-            balanceElement.textContent = userBalance.toLocaleString('uz-UZ') + " so'm";
-            updateStarsEquivalent(userBalance);
+            const b = parseInt(urlBal, 10);
+            try { localStorage.setItem('starpay_balance_' + userId, String(b)); } catch(e) {}
+            setBalUI(b);
             loadedFromUrl = true;
         }
     } catch(e) {}
@@ -171,9 +180,7 @@ function loadUserBalance() {
         try {
             const cachedBal = localStorage.getItem('starpay_balance_' + userId);
             if (cachedBal !== null) {
-                userBalance = parseInt(cachedBal, 10) || 0;
-                balanceElement.textContent = userBalance.toLocaleString('uz-UZ') + " so'm";
-                updateStarsEquivalent(userBalance);
+                setBalUI(parseInt(cachedBal, 10) || 0);
             }
         } catch(e) {}
     }
