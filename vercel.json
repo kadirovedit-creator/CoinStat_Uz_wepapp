@@ -1,4 +1,9 @@
 {
-  " outputDirectory\: \webapp\,
- \cleanUrls\: true
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/webapp/$1"
+    }
+  ]
 }
