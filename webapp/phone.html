@@ -71,22 +71,94 @@
             margin-bottom: 20px;
         }
 
+        /* Coming Soon Hero Banner */
+        .coming-soon-card {
+            background: #121316;
+            border: 1px solid #222328;
+            border-radius: 26px;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .coming-soon-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1c1d22;
+            border: 1px solid #2c2d35;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            font-size: 38px;
+        }
+
+        .coming-soon-badge {
+            background: #27272a;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .coming-soon-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .coming-soon-desc {
+            font-size: 14px;
+            color: #a1a1aa;
+            line-height: 1.5;
+            max-width: 280px;
+        }
+
+        .go-stars-btn {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .go-stars-btn:active {
+            transform: scale(0.98);
+            background: #e4e4e7;
+        }
+
+        /* Preview Countries List */
+        .preview-grid-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #71717a;
+            margin-bottom: 12px;
+        }
+
         .country-card-box {
             background: #141418;
             border: 1px solid #222228;
             border-radius: 22px;
-            padding: 18px 20px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .country-card-box.selected {
-            border-color: #ffffff;
-            background: #1a1a22;
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         .country-left-col {
@@ -110,30 +182,13 @@
             color: #71717a;
         }
 
-        .country-price-text {
-            font-size: 15px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-
-        .phone-submit-button {
-            width: 100%;
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            border-radius: 16px;
-            padding: 15px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .phone-submit-button:active {
-            transform: scale(0.98);
-            background: #e4e4e7;
+        .country-tag {
+            font-size: 11px;
+            font-weight: 700;
+            color: #a1a1aa;
+            background: #27272a;
+            padding: 4px 10px;
+            border-radius: 999px;
         }
 
         /* Bottom Minimal Dock Navigation */
@@ -158,10 +213,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 14px;
+            gap: 4px;
+            padding: 6px 14px;
             border-radius: 18px;
             color: #71717a;
             cursor: pointer;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
         }
 
         .dock-tab-btn.active {
@@ -186,8 +245,21 @@
 
     <div class="phone-page-heading">Virtual Nomer</div>
 
-    <!-- Country Presets -->
-    <div class="country-card-box selected" onclick="selectCountry('AQSH (+1)', 18000, this)">
+    <!-- Coming Soon Card -->
+    <div class="coming-soon-card">
+        <div class="coming-soon-icon">📱</div>
+        <div class="coming-soon-badge">Tez kunda</div>
+        <div class="coming-soon-title">Yaqinda ishga tushadi</div>
+        <div class="coming-soon-desc">
+            Virtual nomer xizmati tez orada ishga tushiriladi. Hozirda Stars va Telegram Premium xizmatlaridan foydalanishingiz mumkin!
+        </div>
+        <button class="go-stars-btn" onclick="window.location.href='stars.html'">⭐ Stars xarid qilish</button>
+    </div>
+
+    <!-- Preview Countries -->
+    <div class="preview-grid-title">Rejalashtirilgan mamlakatlar</div>
+
+    <div class="country-card-box">
         <div class="country-left-col">
             <span class="country-flag">🇺🇸</span>
             <div>
@@ -195,10 +267,10 @@
                 <div class="country-subtext">Telegram SMS uchun</div>
             </div>
         </div>
-        <div class="country-price-text">18 000 UZS</div>
+        <div class="country-tag">Tez kunda</div>
     </div>
 
-    <div class="country-card-box" onclick="selectCountry('Angliya (+44)', 22000, this)">
+    <div class="country-card-box">
         <div class="country-left-col">
             <span class="country-flag">🇬🇧</span>
             <div>
@@ -206,10 +278,10 @@
                 <div class="country-subtext">Telegram SMS uchun</div>
             </div>
         </div>
-        <div class="country-price-text">22 000 UZS</div>
+        <div class="country-tag">Tez kunda</div>
     </div>
 
-    <div class="country-card-box" onclick="selectCountry('Rossiya (+7)', 15000, this)">
+    <div class="country-card-box">
         <div class="country-left-col">
             <span class="country-flag">🇷🇺</span>
             <div>
@@ -217,10 +289,10 @@
                 <div class="country-subtext">Telegram SMS uchun</div>
             </div>
         </div>
-        <div class="country-price-text">15 000 UZS</div>
+        <div class="country-tag">Tez kunda</div>
     </div>
 
-    <div class="country-card-box" onclick="selectCountry('Indoneziya (+62)', 12000, this)">
+    <div class="country-card-box">
         <div class="country-left-col">
             <span class="country-flag">🇮🇩</span>
             <div>
@@ -228,10 +300,8 @@
                 <div class="country-subtext">Telegram SMS uchun</div>
             </div>
         </div>
-        <div class="country-price-text">12 000 UZS</div>
+        <div class="country-tag">Tez kunda</div>
     </div>
-
-    <button class="phone-submit-button" id="buyPhoneBtn" onclick="buyNumber()">Nomer olish</button>
 
     <!-- Floating Minimal Dock Navigation -->
     <div class="bottom-dock-nav">
@@ -255,56 +325,6 @@
 
     <script src="js/common.js"></script>
     <script>
-        let selectedCountry = 'AQSH (+1)';
-        let selectedPrice = 18000;
-
-        function selectCountry(country, price, el) {
-            selectedCountry = country;
-            selectedPrice = price;
-            document.querySelectorAll('.country-card-box').forEach(c => c.classList.remove('selected'));
-            if (el) el.classList.add('selected');
-        }
-
-        async function buyNumber() {
-            const btn = document.getElementById('buyPhoneBtn');
-            const oldText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = '⏳ ...';
-
-            const userId = getUserId();
-            const apiBase = getApiBase();
-
-            try {
-                const res = await fetch((apiBase ? apiBase : '') + '/api/order/stars', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
-                    body: JSON.stringify({
-                        telegram_id: userId,
-                        product_type: `Virtual Nomer (${selectedCountry})`,
-                        amount: selectedPrice,
-                        initData: tg.initData || ''
-                    })
-                });
-
-                const data = await res.json();
-                if (data && data.ok) {
-                    if (tg.showAlert) tg.showAlert(`✅ ${selectedCountry} raqami uchun so'rov qabul qilindi!`);
-                    else alert(`✅ ${selectedCountry} raqami uchun so'rov qabul qilindi!`);
-                    setTimeout(() => window.location.href = 'orders.html', 1000);
-                } else {
-                    const err = data?.error || 'Xaridda xatolik yuz berdi.';
-                    if (tg.showAlert) tg.showAlert(err);
-                    else alert(err);
-                }
-            } catch (err) {
-                if (tg.showAlert) tg.showAlert('Xatolik: ' + err.message);
-                else alert('Xatolik: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = oldText;
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', loadUserBalance);
     </script>
 </body>
