@@ -297,11 +297,8 @@
 
     <script src="js/common.js"></script>
     <script>
-        const tg = window.Telegram?.WebApp || {};
-        try { tg.expand?.(); tg.ready?.(); } catch (e) {}
-
         function setMyUsername() {
-            const user = tg.initDataUnsafe?.user;
+            const user = tg?.initDataUnsafe?.user;
             const input = document.getElementById('username');
             if (input) {
                 if (user && user.username) input.value = '@' + user.username;
@@ -313,12 +310,13 @@
         async function buyStarTier(qty, price, btn) {
             let uVal = (document.getElementById('username')?.value || '').trim().replace(/^@/, '');
             if (!uVal) {
-                const tgUser = tg.initDataUnsafe?.user;
+                const tgUser = tg?.initDataUnsafe?.user;
                 if (tgUser?.username) uVal = tgUser.username;
+                else if (tgUser?.id) uVal = String(tgUser.id);
             }
 
             if (!uVal) {
-                if (tg.showAlert) tg.showAlert('Iltimos, Telegram foydalanuvchi nomini kiriting!');
+                if (tg?.showAlert) tg.showAlert('Iltimos, Telegram foydalanuvchi nomini kiriting!');
                 else alert('Iltimos, Telegram foydalanuvchi nomini kiriting!');
                 return;
             }
@@ -333,28 +331,29 @@
             try {
                 const res = await fetch((apiBase ? apiBase : '') + '/api/order/stars', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
+                    headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg?.initData || '' },
                     body: JSON.stringify({
                         telegram_id: userId,
                         username: uVal,
                         quantity: qty,
                         amount: price,
-                        initData: tg.initData || ''
+                        product_type: 'stars',
+                        initData: tg?.initData || ''
                     })
                 });
 
                 const data = await res.json();
                 if (data && data.ok) {
-                    if (tg.showAlert) tg.showAlert(`✅ ${qty} Stars muvaffaqiyatli xarid qilindi!`);
+                    if (tg?.showAlert) tg.showAlert(`✅ ${qty} Stars muvaffaqiyatli xarid qilindi!`);
                     else alert(`✅ ${qty} Stars muvaffaqiyatli xarid qilindi!`);
                     setTimeout(() => window.location.href = 'orders.html', 1000);
                 } else {
                     const err = data?.error || 'Xaridda xatolik yuz berdi.';
-                    if (tg.showAlert) tg.showAlert(err);
+                    if (tg?.showAlert) tg.showAlert(err);
                     else alert(err);
                 }
             } catch (err) {
-                if (tg.showAlert) tg.showAlert('Serverga ulanishda xatolik: ' + err.message);
+                if (tg?.showAlert) tg.showAlert('Serverga ulanishda xatolik: ' + err.message);
                 else alert('Serverga ulanishda xatolik: ' + err.message);
             } finally {
                 btn.disabled = false;
