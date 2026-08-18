@@ -47,13 +47,13 @@ function sendTelegramMessage(botToken, chatId, text) {
 
 function callFragmentApi(endpoint, body) {
   return new Promise((resolve, reject) => {
-    const apiKey = '36decf131e0a2ebec1b24d255839c065232ac4df';
+    const apiKey = process.env.FRAGMENT_API_KEY || 'b66c0e21a8b6a2d76c9861550e7c0349c1ece0b2';
     const payload = JSON.stringify(body);
 
     const options = {
       hostname: 'fragment-api.uz',
       port: 443,
-      path: `/api/${endpoint.replace(/^\//, '')}`,
+      path: `/api/v1/${endpoint.replace(/^\//, '')}`,
       method: 'POST',
       headers: {
         'X-API-Key': apiKey,
@@ -116,7 +116,7 @@ module.exports = async (req, res) => {
   }
 
   const price = quantity * 200; // 200 so'm per star
-  const botToken = process.env.BOT_TOKEN || '8350264300:AAGiym42sNw2fvLun754WTJTYOTIDLw9CPw';
+  const botToken = process.env.BOT_TOKEN || '8540635645:AAE3c-NEqdR4F05X_7Vyiq7kP3XD5PmzX7Y';
 
   try {
     const db = getPool();

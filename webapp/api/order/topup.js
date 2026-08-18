@@ -76,7 +76,7 @@ module.exports = async (req, res) => {
   }
 
   const orderId = 'TOP_' + Date.now();
-  const botToken = process.env.BOT_TOKEN || '8350264300:AAGiym42sNw2fvLun754WTJTYOTIDLw9CPw';
+  const botToken = process.env.BOT_TOKEN || '8540635645:AAE3c-NEqdR4F05X_7Vyiq7kP3XD5PmzX7Y';
   const adminId = 8202423244;
 
   try {
