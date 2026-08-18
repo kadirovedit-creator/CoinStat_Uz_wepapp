@@ -1,5 +1,4 @@
 {
-  "version": 2,
-  "name": "starpayuz-webapp",
+  "framework": null,
   "cleanUrls": true
 }
