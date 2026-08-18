@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CoinStat UZ - Telegram Sovg'alari</title>
+    <title>CoinStat UZ - Sovg'alar</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="css/style.css?v=12.0">
     <style>
@@ -71,119 +71,125 @@
             margin-bottom: 20px;
         }
 
-        /* 2x4 Gifts Grid */
-        .gifts-quad-grid {
+        /* Coming Soon Hero Banner */
+        .coming-soon-card {
+            background: #121316;
+            border: 1px solid #222328;
+            border-radius: 26px;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .coming-soon-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1c1d22;
+            border: 1px solid #2c2d35;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .coming-soon-icon img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+        }
+
+        .coming-soon-badge {
+            background: #27272a;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .coming-soon-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .coming-soon-desc {
+            font-size: 14px;
+            color: #a1a1aa;
+            line-height: 1.5;
+            max-width: 280px;
+        }
+
+        .go-stars-btn {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 28px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .go-stars-btn:active {
+            transform: scale(0.98);
+            background: #e4e4e7;
+        }
+
+        /* 2x4 Preview Grid (Disabled/Preview look) */
+        .preview-grid-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #71717a;
+            margin-bottom: 12px;
+        }
+
+        .gifts-preview-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            margin-bottom: 20px;
+            opacity: 0.6;
+            margin-bottom: 24px;
+            pointer-events: none;
         }
 
-        .gift-card-tile {
+        .gift-preview-card {
             background: #141418;
             border: 1px solid #222228;
-            border-radius: 22px;
-            padding: 18px 12px;
+            border-radius: 20px;
+            padding: 16px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
         }
 
-        .gift-card-tile.selected {
-            border-color: #ffffff;
-            background: #1a1a22;
-        }
-
-        .gift-icon-wrap {
-            width: 54px;
-            height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .gift-icon-wrap img {
-            width: 48px;
-            height: 48px;
+        .gift-preview-card img {
+            width: 42px;
+            height: 42px;
             object-fit: contain;
         }
 
-        .gift-tile-name {
-            font-size: 14px;
-            font-weight: 800;
-            color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 130px;
-        }
-
-        .gift-tile-price {
+        .gift-preview-name {
             font-size: 13px;
             font-weight: 700;
-            color: #a1a1aa;
-        }
-
-        /* Recipient Input */
-        .recipient-dark-bar {
-            background: #141418;
-            border: 1px solid #222228;
-            border-radius: 18px;
-            padding: 16px 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .recipient-dark-input {
-            background: transparent;
-            border: none;
-            outline: none;
             color: #ffffff;
-            font-size: 15px;
+        }
+
+        .gift-preview-tag {
+            font-size: 11px;
             font-weight: 600;
-            width: 100%;
-        }
-
-        .recipient-dark-input::placeholder {
-            color: #52525b;
-        }
-
-        .for-me-pill {
-            background: #27272a;
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* Submit Button */
-        .gift-submit-button {
-            width: 100%;
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            border-radius: 16px;
-            padding: 15px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .gift-submit-button:active {
-            transform: scale(0.98);
-            background: #e4e4e7;
+            color: #71717a;
         }
 
         /* Bottom Minimal Dock Navigation */
@@ -208,10 +214,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 14px;
+            gap: 4px;
+            padding: 6px 14px;
             border-radius: 18px;
             color: #71717a;
             cursor: pointer;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
         }
 
         .dock-tab-btn.active {
@@ -236,188 +246,67 @@
 
     <div class="gift-page-heading">Telegram Sovg'alari</div>
 
-    <!-- Gifts Grid (2x4) -->
-    <div class="gifts-quad-grid">
-        <!-- Delicious Cake -->
-        <div class="gift-card-tile selected" onclick="selectGift('Delicious Cake', 15000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/cake.webp" alt="Cake">
-            </div>
-            <div class="gift-tile-name">Delicious Cake</div>
-            <div class="gift-tile-price">15 000 UZS</div>
+    <!-- Coming Soon Card -->
+    <div class="coming-soon-card">
+        <div class="coming-soon-icon">
+            <img src="./images/gift.webp" alt="Gift">
         </div>
-
-        <!-- Telegram Star -->
-        <div class="gift-card-tile" onclick="selectGift('Telegram Star', 25000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/star.webp" alt="Star">
-            </div>
-            <div class="gift-tile-name">Telegram Star</div>
-            <div class="gift-tile-price">25 000 UZS</div>
+        <div class="coming-soon-badge">Tez kunda</div>
+        <div class="coming-soon-title">Yaqinda ishga tushadi</div>
+        <div class="coming-soon-desc">
+            Telegram Sovg'alar xizmati tez orada ishga tushiriladi. Hozirda Stars va Premium xizmatlaridan foydalanishingiz mumkin!
         </div>
-
-        <!-- Golden Box -->
-        <div class="gift-card-tile" onclick="selectGift('Golden Box', 50000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/box.webp" alt="Box">
-            </div>
-            <div class="gift-tile-name">Golden Box</div>
-            <div class="gift-tile-price">50 000 UZS</div>
-        </div>
-
-        <!-- Luxury Heart -->
-        <div class="gift-card-tile" onclick="selectGift('Luxury Heart', 80000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/heart.webp" alt="Heart">
-            </div>
-            <div class="gift-tile-name">Luxury Heart</div>
-            <div class="gift-tile-price">80 000 UZS</div>
-        </div>
-
-        <!-- Diamond Ring -->
-        <div class="gift-card-tile" onclick="selectGift('Diamond Ring', 150000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/ring.webp" alt="Ring">
-            </div>
-            <div class="gift-tile-name">Diamond Ring</div>
-            <div class="gift-tile-price">150 000 UZS</div>
-        </div>
-
-        <!-- Space Rocket -->
-        <div class="gift-card-tile" onclick="selectGift('Space Rocket', 250000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/rocket.webp" alt="Rocket">
-            </div>
-            <div class="gift-tile-name">Space Rocket</div>
-            <div class="gift-tile-price">250 000 UZS</div>
-        </div>
-
-        <!-- Teddy Bear -->
-        <div class="gift-card-tile" onclick="selectGift('Teddy Bear', 350000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/bear.webp" alt="Bear">
-            </div>
-            <div class="gift-tile-name">Teddy Bear</div>
-            <div class="gift-tile-price">350 000 UZS</div>
-        </div>
-
-        <!-- Cyber Diamond -->
-        <div class="gift-card-tile" onclick="selectGift('Cyber Diamond', 1000000, this)">
-            <div class="gift-icon-wrap">
-                <img src="./images/diamond.webp" alt="Diamond">
-            </div>
-            <div class="gift-tile-name">Cyber Diamond</div>
-            <div class="gift-tile-price">1 000 000 UZS</div>
-        </div>
+        <button class="go-stars-btn" onclick="window.location.href='stars.html'">⭐ Stars xarid qilish</button>
     </div>
 
-    <!-- Recipient Input -->
-    <div class="recipient-dark-bar">
-        <input type="text" id="username" class="recipient-dark-input" placeholder="@username">
-        <button class="for-me-pill" onclick="setMyUsername()">O'zimga</button>
+    <!-- Preview Items Grid -->
+    <div class="preview-grid-title">Rejalashtirilgan sovg'alar</div>
+    <div class="gifts-preview-grid">
+        <div class="gift-preview-card">
+            <img src="./images/cake.webp" alt="Cake">
+            <div class="gift-preview-name">Delicious Cake</div>
+            <div class="gift-preview-tag">Tez kunda</div>
+        </div>
+        <div class="gift-preview-card">
+            <img src="./images/star.webp" alt="Star">
+            <div class="gift-preview-name">Telegram Star</div>
+            <div class="gift-preview-tag">Tez kunda</div>
+        </div>
+        <div class="gift-preview-card">
+            <img src="./images/box.webp" alt="Box">
+            <div class="gift-preview-name">Golden Box</div>
+            <div class="gift-preview-tag">Tez kunda</div>
+        </div>
+        <div class="gift-preview-card">
+            <img src="./images/heart.webp" alt="Heart">
+            <div class="gift-preview-name">Luxury Heart</div>
+            <div class="gift-preview-tag">Tez kunda</div>
+        </div>
     </div>
-
-    <!-- Submit Button -->
-    <button class="gift-submit-button" id="submitBtn" onclick="buyGift()">Sovg'a yuborish</button>
 
     <!-- Floating Minimal Dock Navigation -->
     <div class="bottom-dock-nav">
         <div class="dock-tab-btn" onclick="window.location.href='index.html'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </div>
-        <div class="dock-tab-btn" onclick="window.location.href='orders.html'">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Asosiy</span>
         </div>
         <div class="dock-tab-btn active" onclick="window.location.href='gift.html'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
+            <span>Gift</span>
         </div>
         <div class="dock-tab-btn" onclick="window.location.href='rating.html'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg>
+            <span>Top</span>
         </div>
         <div class="dock-tab-btn" onclick="window.location.href='profile.html'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Profil</span>
         </div>
     </div>
 
     <script src="js/common.js"></script>
     <script>
-        let selectedGiftName = 'Delicious Cake';
-        let selectedGiftPrice = 15000;
-
-        function selectGift(name, price, el) {
-            selectedGiftName = name;
-            selectedGiftPrice = price;
-            document.querySelectorAll('.gift-card-tile').forEach(c => c.classList.remove('selected'));
-            if (el) el.classList.add('selected');
-        }
-
-        function setMyUsername() {
-            const user = tg.initDataUnsafe?.user;
-            const input = document.getElementById('username');
-            if (input) {
-                if (user && user.username) input.value = '@' + user.username;
-                else if (user && user.id) input.value = user.id;
-                else input.value = '@men';
-            }
-        }
-
-        async function buyGift() {
-            let uVal = (document.getElementById('username')?.value || '').trim().replace(/^@/, '');
-            if (!uVal) {
-                const tgUser = tg.initDataUnsafe?.user;
-                if (tgUser?.username) uVal = tgUser.username;
-            }
-
-            if (!uVal) {
-                if (tg.showAlert) tg.showAlert('Iltimos, Telegram foydalanuvchi nomini kiriting!');
-                else alert('Iltimos, Telegram foydalanuvchi nomini kiriting!');
-                return;
-            }
-
-            const btn = document.getElementById('submitBtn');
-            const oldText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = '⏳ ...';
-
-            const userId = getUserId();
-            const apiBase = getApiBase();
-
-            try {
-                const res = await fetch((apiBase ? apiBase : '') + '/api/order/gift', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
-                    body: JSON.stringify({
-                        telegram_id: userId,
-                        username: uVal,
-                        gift_name: selectedGiftName,
-                        amount: selectedGiftPrice,
-                        initData: tg.initData || ''
-                    })
-                });
-
-                const data = await res.json();
-                if (data && data.ok) {
-                    if (tg.showAlert) tg.showAlert(`✅ "${selectedGiftName}" sovg'asi muvaffaqiyatli yuborildi!`);
-                    else alert(`✅ "${selectedGiftName}" sovg'asi muvaffaqiyatli yuborildi!`);
-                    setTimeout(() => window.location.href = 'orders.html', 1000);
-                } else {
-                    const err = data?.error || 'Xaridda xatolik yuz berdi.';
-                    if (tg.showAlert) tg.showAlert(err);
-                    else alert(err);
-                }
-            } catch (err) {
-                if (tg.showAlert) tg.showAlert('Serverga ulanishda xatolik: ' + err.message);
-                else alert('Serverga ulanishda xatolik: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = oldText;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            setMyUsername();
-            loadUserBalance();
-        });
+        document.addEventListener('DOMContentLoaded', loadUserBalance);
     </script>
 </body>
 
