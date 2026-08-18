@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CoinStat UZ - Reyting</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="css/style.css?v=10.0">
+    <link rel="stylesheet" href="css/style.css?v=11.0">
     <style>
         .page-header-title-box {
             display: flex;
@@ -27,11 +27,10 @@
         }
 
         .rating-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            backdrop-filter: blur(16px);
+            background: #111a2c;
+            border: 1px solid #1f2d48;
             border-radius: 22px;
-            padding: 10px;
+            padding: 8px 10px;
             box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
             margin-bottom: 20px;
         }
@@ -39,8 +38,8 @@
         .rating-item {
             display: flex;
             align-items: center;
-            padding: 14px 12px;
-            border-bottom: 1px solid var(--border-card);
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             gap: 12px;
             border-radius: 14px;
             transition: background 0.2s ease;
@@ -82,25 +81,44 @@
             font-size: 14px;
         }
 
-        .avatar-circle {
-            width: 40px;
-            height: 40px;
+        .avatar-slot {
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
-            font-weight: 800;
             flex-shrink: 0;
+            background: #172133;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .avatar-circle-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .avatar-circle-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
             color: #ffffff;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
 
         .rating-username {
             font-size: 14px;
             font-weight: 700;
-            color: var(--text-main);
+            color: #ffffff;
             flex: 1;
             white-space: nowrap;
             overflow: hidden;
@@ -110,7 +128,7 @@
         .rating-amount {
             font-size: 14px;
             font-weight: 800;
-            color: #ffffff;
+            color: #38bdf8;
             white-space: nowrap;
         }
 
@@ -136,7 +154,7 @@
         <div class="loader-sub" data-i18n="loader.sub">Yuklanmoqda...</div>
     </div>
 
-    <!-- Top Profile Header Bar (Horizontal Left-Aligned Layout matching reference screenshot) -->
+    <!-- Top Profile Header Bar -->
     <div class="top-header-bar">
         <div class="top-header-left">
             <div class="user-avatar-wrap">
@@ -165,7 +183,7 @@
         </button>
     </div>
 
-    <!-- Page Title with Line SVG Icon -->
+    <!-- Page Title -->
     <div class="page-header-title-box">
         <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; color: #ffffff;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -258,6 +276,9 @@
 
     function renderLeaderboard(list, container) {
         let html = '';
+        const currentUserId = String(tg.initDataUnsafe?.user?.id || '');
+        const currentUserPhoto = tg.initDataUnsafe?.user?.photo_url || '';
+
         list.forEach((item, i) => {
             const rank = i + 1;
             let rankBadge = '#' + rank;
@@ -270,10 +291,22 @@
             const username = item.username ? '@' + item.username : 'User#' + (item.telegram_id || '100');
             const total = (item.total || 0).toLocaleString('uz-UZ') + " so'm";
 
+            let photoUrl = item.photo_url || item.avatar_url || '';
+            if (!photoUrl && String(item.telegram_id) === currentUserId && currentUserPhoto) {
+                photoUrl = currentUserPhoto;
+            }
+
+            let avatarHtml = '';
+            if (photoUrl) {
+                avatarHtml = `<img src="${photoUrl}" class="avatar-circle-img" alt="${username}" onerror="this.outerHTML='<div class=\\'avatar-circle-fallback\\'>${firstLetter}</div>'">`;
+            } else {
+                avatarHtml = `<img src="./images/logo.png" class="avatar-circle-img" alt="${username}">`;
+            }
+
             html += `
                 <div class="rating-item">
                     <div class="rank ${rankClass}">${rankBadge}</div>
-                    <div class="avatar-circle">${firstLetter}</div>
+                    <div class="avatar-slot">${avatarHtml}</div>
                     <div class="rating-username">${username}</div>
                     <div class="rating-amount">${total}</div>
                 </div>
