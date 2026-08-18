@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function () {
     loadUserBalance();
     applyTranslations();
     hideLoader();
+
+    // Real-time live balance auto-sync every 3 seconds
+    setInterval(loadUserBalance, 3000);
 });
 
 function initTheme() {
