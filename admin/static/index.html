@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarPayUz Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-page">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="logo-icon">SP</div>
+                <h1>StarPayUz Admin</h1>
+                <p>Войдите в панель управления</p>
+            </div>
+            <div id="loginError" class="login-error"></div>
+            <form id="loginForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label class="form-label">Имя пользователя</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="admin" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" onclick="handleLogin()">
+                    Войти
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="appContainer" class="app-container" style="display:none;">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">SP</div>
+                <div>
+                    <h1>StarPayUz</h1>
+                    <div class="subtitle">Admin Panel v1.0</div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Главная</div>
+                    <a class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+                        <span class="icon">📊</span> Dashboard
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Управление</div>
+                    <a class="nav-item" data-page="users" onclick="navigateTo('users')">
+                        <span class="icon">👥</span> Пользователи
+                    </a>
+                    <a class="nav-item" data-page="balance" onclick="navigateTo('balance')">
+                        <span class="icon">💰</span> Баланс
+                    </a>
+                    <a class="nav-item" data-page="broadcasts" onclick="navigateTo('broadcasts')">
+                        <span class="icon">📢</span> Рассылка
+                    </a>
+                    <a class="nav-item" data-page="orders" onclick="navigateTo('orders')">
+                        <span class="icon">📦</span> Заказы
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Настройки</div>
+                    <a class="nav-item" data-page="settings" onclick="navigateTo('settings')">
+                        <span class="icon">⚙️</span> Настройки
+                    </a>
+                    <a class="nav-item" data-page="logs" onclick="navigateTo('logs')">
+                        <span class="icon">📋</span> Логи
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="admin-info">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div class="admin-details">
+                        <div class="admin-name" id="adminName">Admin</div>
+                        <div class="admin-role" id="adminRole">admin</div>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()">Выход</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Content loaded dynamically -->
+            <div class="loading" id="pageLoading">
+                <div class="loading-spinner"></div>
+                Загрузка...
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn btn-outline" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-primary" id="modalConfirmBtn" onclick="modalConfirm()">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/balance.js"></script>
+    <script src="js/broadcasts.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/logs.js"></script>
+    <script src="js/orders.js"></script>
+    <script>initApp();</script>
+</body>
+</html>

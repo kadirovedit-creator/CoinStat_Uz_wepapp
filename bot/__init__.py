@@ -1,0 +1,1 @@
+# StarPayUz bot package

@@ -1,0 +1,122 @@
+# StarPayUz - Complete Stack Docker Compose
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: starpayuz-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: starpayuz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - starpayuz-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: starpayuz-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - starpayuz-network
+
+  # Telegram Bot
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: starpayuz-bot
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/starpayuz
+      REDIS_URL: redis://redis:6379/0
+    command: python run_bot.py
+    networks:
+      - starpayuz-network
+
+  # API Server (aiohttp)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: starpayuz-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/starpayuz
+      REDIS_URL: redis://redis:6379/0
+      ADMIN_PORT: 8000
+      API_PORT: 8080
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    command: python run_server.py
+    networks:
+      - starpayuz-network
+
+  # Admin Panel (FastAPI)
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: starpayuz-admin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/starpayuz
+      REDIS_URL: redis://redis:6379/0
+      ADMIN_PORT: 8000
+    ports:
+      - "8000:8000"
+    command: uvicorn admin.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    networks:
+      - starpayuz-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  starpayuz-network:
+    driver: bridge

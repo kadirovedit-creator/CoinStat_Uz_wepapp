@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StarPayUz - Nomer olish</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        window.API_BASE = 'https://test-uz-r78q.onrender.com';
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
+
+    body {
+        background: #030712;
+        color: #fff;
+        padding: 20px;
+        padding-bottom: 200px;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 35px;
+    }
+
+    .header-left__image {
+        width: 60px;
+        height: 60px;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .balance-badge {
+        color: #fff;
+        font-weight: 600;
+        border: 1px solid #3B82F6;
+        background: #031632;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+    }
+
+    .add-button {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 50%;
+        background: #3B82F6;
+        color: #fff;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(59, 130, 246, .3);
+    }
+
+    .page-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .page-title h2 {
+        color: #3B82F6;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .section-label {
+        display: block;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .input-wrapper {
+        position: relative;
+        margin-bottom: 25px;
+    }
+
+    .inside-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 22px;
+        height: 22px;
+    }
+
+    .input {
+        width: 100%;
+        height: 56px;
+        background: #111827;
+        border: 2px solid #3B82F6;
+        border-radius: 18px;
+        padding-left: 50px;
+        padding-right: 15px;
+        color: #fff;
+        font-size: 16px;
+        outline: none;
+    }
+
+    .input::placeholder {
+        color: #9CA3AF;
+    }
+
+    .info-card {
+        background: #111827;
+        border: 2px solid #3B82F6;
+        border-radius: 22px;
+        padding: 18px;
+        margin-bottom: 20px;
+        color: #9CA3AF;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .btn-primary {
+        width: 100%;
+        height: 58px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 18px;
+        background: #3B82F6;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 0 25px rgba(59, 130, 246, .3);
+    }
+
+    .btn-primary:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    .bottom-nav {
+        position: fixed;
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+        z-index: 50;
+        background: #111827;
+        border: 1px solid rgba(255, 255, 255, .05);
+        border-radius: 28px;
+        padding: 12px 10px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        backdrop-filter: blur(20px);
+        pointer-events: auto;
+    }
+
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 70px;
+        color: #9CA3AF;
+        cursor: pointer;
+        transition: .3s;
+    }
+
+    .nav-item:hover {
+        color: #fff;
+    }
+
+    .nav-item.active {
+        color: #3B82F6;
+    }
+
+    .nav-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 34px;
+    }
+
+    .nav-icon img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+    }
+
+    .nav-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: inherit;
+    }
+</style>
+
+<body>
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-star">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <img src="./images/loader.webp" alt="">
+        </div>
+        <div class="loader-text">StarPayUz</div>
+        <div class="loader-sub" data-i18n="loader.sub">Yuklanmoqda...</div>
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <a href="stars.html">
+                <img src="./images/logo.png" alt="" class="header-left__image">
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="balance-badge" id="balance">0 so'm</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="page-title">
+            <span style="font-size: 28px;">📞</span>
+            <h2 data-i18n="phone.title">Virtual nomer olish</h2>
+        </div>
+
+        <div class="info-card" data-i18n="phone.info">
+            Telegram uchun virtual raqam. Mamlakatni tanlang va username kiriting.
+        </div>
+
+        <h3 class="section-label" data-i18n="common.recipient">Qabul qiluvchi</h3>
+        <div class="input-wrapper">
+            <img src="./images/user.webp" class="inside-icon" alt="">
+            <input type="text" id="username" data-i18n-placeholder="common.enter_username" placeholder="Username kiriting" class="input">
+        </div>
+
+        <h3 class="section-label" data-i18n="phone.country">Mamlakat</h3>
+        <div class="input-wrapper">
+            <select id="country" class="input" style="padding-left: 18px;" onchange="updatePhonePrice()">
+                <option value="UZ" data-price="50000">🇺🇿 O'zbekiston — 50 000 so'm</option>
+                <option value="RU" data-price="80000">🇷🇺 Rossiya — 80 000 so'm</option>
+                <option value="KZ" data-price="60000">🇰🇿 Qozog'iston — 60 000 so'm</option>
+                <option value="US" data-price="120000">🇺🇸 AQSH — 120 000 so'm</option>
+            </select>
+        </div>
+
+        <button class="btn-primary" id="buyBtn" onclick="buyPhone()">Sotib olish</button>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        let phonePrice = 50000;
+
+        function updatePhonePrice() {
+            const sel = document.getElementById('country');
+            phonePrice = parseInt(sel.options[sel.selectedIndex].dataset.price, 10);
+        }
+
+        function buyPhone() {
+            const username = getUsername('username');
+            if (!username) {
+                tg.showAlert('Iltimos, username kiriting!');
+                return;
+            }
+            const country = document.getElementById('country').value;
+            submitOrder({
+                action: 'buy_phone',
+                username: username,
+                country: country,
+                price: phonePrice
+            });
+        }
+
+        function openStars() { window.location.href = 'stars.html'; }
+        function openGifts() { window.location.href = 'gift.html'; }
+        function openReyting() { window.location.href = 'rating.html'; }
+
+        function openStars() {
+            window.location.href = 'stars.html';
+        }
+
+        function openGifts() {
+            window.location.href = 'gift.html';
+        }
+
+        function openProfile() {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="openStars()">
+            <div class="nav-icon">
+                <img src="./images/home.webp" alt="home">
+            </div>
+            <div class="nav-label" data-i18n="nav.menu">Menu</div>
+        </div>
+
+        <div class="nav-item" onclick="openGifts()">
+            <div class="nav-icon">
+                <img src="./images/gift.webp" alt="Gifts">
+            </div>
+            <div class="nav-label" data-i18n="nav.gifts">Gifts</div>
+        </div>
+
+        <div class="nav-item" onclick="openReyting()">
+            <div class="nav-icon">
+                <img src="./images/rating.webp" alt="Rating">
+            </div>
+            <div class="nav-label" data-i18n="nav.rating">Rating</div>
+        </div>
+
+        <div class="nav-item" onclick="openProfile()">
+            <div class="nav-icon">
+                <img src="./images/profile.webp" alt="profile">
+            </div>
+            <div class="nav-label" data-i18n="nav.profile">Profil</div>
+        </div>
+    </div>
+</body>
+
+</html>
