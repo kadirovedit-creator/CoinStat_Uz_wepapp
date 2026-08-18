@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/webapp/$1"
-    }
-  ]
+  "name": "starpayuz-webapp",
+  "cleanUrls": true
 }

@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CoinStat UZ - Profil</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>window.API_BASE = 'https://witty-planes-admire.loca.lt';</script>
+    <link rel="stylesheet" href="css/style.css?v=10.0">
+    <style>
+        /* Profile Custom Layout matching user reference screenshot */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 24px;
+            padding-bottom: 120px;
+        }
+
+        .top-lang-bar {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .lang-pill-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(13, 19, 34, 0.8);
+            border: 1px solid var(--border-card);
+            padding: 6px 12px;
+            border-radius: 999px;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .lang-pill-btn:active {
+            transform: scale(0.95);
+        }
+
+        .profile-avatar-large {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            box-shadow: 0 0 30px rgba(2, 132, 199, 0.45);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .profile-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar-initial {
+            font-size: 38px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .profile-user-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .profile-id-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .profile-id-row:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* 3-Column Stats Grid Banner */
+        .profile-stats-grid {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 18px 10px;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            position: relative;
+        }
+
+        .stat-col:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: var(--border-card);
+        }
+
+        .stat-col-val {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-sky);
+        }
+
+        .stat-col-lbl {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Profile Action List Cards */
+        .profile-actions-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .profile-action-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            backdrop-filter: blur(16px);
+            border-radius: 18px;
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .profile-action-card:hover, .profile-action-card:active {
+            transform: translateY(-2px);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .profile-action-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .profile-action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-sky);
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .profile-action-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .profile-action-arrow {
+            color: var(--text-sub);
+            font-size: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-action-card:hover .profile-action-arrow {
+            transform: translateX(3px);
+            color: var(--accent-sky);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-star">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <img src="./images/loader.webp" alt="Loader">
+        </div>
+        <div class="loader-text">CoinStat UZ</div>
+        <div class="loader-sub" data-i18n="loader.sub">Yuklanmoqda...</div>
+    </div>
+
+    <div class="profile-container">
+
+        <!-- Top Profile Header Bar (Horizontal Left-Aligned Layout matching reference screenshot) -->
+        <div class="top-header-bar">
+            <div class="top-header-left">
+                <div class="user-avatar-wrap">
+                    <img src="" id="avatarImg" style="display:none;" alt="Avatar">
+                    <span class="user-avatar-initial" id="avatarPlaceholder">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                    </span>
+                </div>
+                <div class="user-meta-col">
+                    <div class="user-title-name" id="profileName">Foydalanuvchi</div>
+                    <div class="user-id-row" onclick="copyUserId()" title="Nusxalash">
+                        <span id="profileUserId">ID: —</span>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <button class="lang-pill-btn" onclick="toggleLanguage()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span data-i18n-lang="profile.lang_">Русский</span>
+                <span style="opacity:0.6; font-size:10px;">v</span>
+            </button>
+        </div>
+
+        <!-- 3-Column Stats Grid Banner -->
+        <div class="profile-stats-grid">
+            <div class="stat-col" onclick="openTransactionsModal()" style="cursor: pointer;" title="Buyurtmalarni ko'rish">
+                <div class="stat-col-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </div>
+                <div class="stat-col-val" id="ordersCount">0</div>
+                <div class="stat-col-lbl">Buyurtmalar</div>
+            </div>
+            <div class="stat-col">
+                <div class="stat-col-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </div>
+                <div class="stat-col-val" id="totalSpent">0</div>
+                <div class="stat-col-lbl">Sarflangan</div>
+            </div>
+            <div class="stat-col">
+                <div class="stat-col-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+                    </svg>
+                </div>
+                <div class="stat-col-val" id="userBalanceStat">0</div>
+                <div class="stat-col-lbl">Balans</div>
+            </div>
+        </div>
+
+        <!-- Action List Cards -->
+        <div class="profile-actions-list">
+
+            <!-- Buyurtmalar tarixi -->
+            <div class="profile-action-card" onclick="openTransactionsModal()">
+                <div class="profile-action-left">
+                    <div class="profile-action-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="profile-action-title">Buyurtmalar tarixi</div>
+                </div>
+                <div class="profile-action-arrow">›</div>
+            </div>
+
+            <!-- Admin bilan bog'lanish -->
+            <div class="profile-action-card" onclick="openSupport()">
+                <div class="profile-action-left">
+                    <div class="profile-action-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="profile-action-title">Admin bilan bog'lanish</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">Rasmiy Telegram Admin: @cofeature</div>
+                    </div>
+                </div>
+                <div class="profile-action-arrow">›</div>
+            </div>
+
+            <!-- Mening Sovg'alarim -->
+            <div class="profile-action-card" onclick="openMyGiftsModal()">
+                <div class="profile-action-left">
+                    <div class="profile-action-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                            <rect x="2" y="7" width="20" height="5"></rect>
+                            <line x1="12" y1="22" x2="12" y2="7"></line>
+                            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="profile-action-title">Mening Giftlarim</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">Kolleksiya va olingan sovg'alar</div>
+                    </div>
+                </div>
+                <div class="profile-action-arrow">›</div>
+            </div>
+
+            <!-- Yangiliklar va E'lonlar -->
+            <div class="profile-action-card" onclick="openNewsModal()">
+                <div class="profile-action-left">
+                    <div class="profile-action-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="profile-action-title">Yangiliklar va E'lonlar</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">Rasmiy telegram kanalimiz: @CoinStatUz</div>
+                    </div>
+                </div>
+                <div class="profile-action-arrow">›</div>
+            </div>
+
+            <!-- Sozlamalar -->
+            <div class="profile-action-card" onclick="openSettingsModal()">
+                <div class="profile-action-left">
+                    <div class="profile-action-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </div>
+                    <div class="profile-action-title" data-i18n="profile.section.settings">Sozlamalar</div>
+                </div>
+                <div class="profile-action-arrow">›</div>
+            </div>
+
+        </div>
+
+        <!-- STATISTIKA PRODAJ SECTION -->
+        <div class="stats-section-container">
+            <div class="stats-section-header">
+                <div class="stats-header-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span>Statistika prodaj</span>
+                </div>
+                <div class="stats-header-more" onclick="openTransactionsModal()">
+                    <span>Ko'rish</span>
+                    <span>›</span>
+                </div>
+            </div>
+
+            <!-- Scrollable Filter Pills matching reference screenshot -->
+            <div class="stats-time-pills">
+                <button class="stats-pill-btn active" onclick="filterStatsTime('today', this)">Bugun</button>
+                <button class="stats-pill-btn" onclick="filterStatsTime('week', this)">Na etoy nedele</button>
+                <button class="stats-pill-btn" onclick="filterStatsTime('month', this)">V etom mesyase</button>
+                <button class="stats-pill-btn" onclick="filterStatsTime('all', this)">Za vse vremya</button>
+            </div>
+
+            <div class="stats-summary-card">
+                <div class="stats-summary-row">
+                    <div class="stats-summary-item">
+                        <span class="stats-summary-label">Muvaffaqiyatli buyurtmalar</span>
+                        <span class="stats-summary-val" id="statsPeriodOrders">0 ta</span>
+                    </div>
+                    <div class="stats-summary-item">
+                        <span class="stats-summary-label">Jami sarflangan</span>
+                        <span class="stats-summary-val" id="statsPeriodSpent">0 so'm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REFERRAL SYSTEM CARD BANNER -->
+        <div class="referral-card" style="width: 100%; border-radius: 22px; background: var(--bg-card); border: 1px solid var(--border-card); padding: 20px;">
+            <div class="referral-title" style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span data-i18n="profile.referral_title" style="font-size: 16px; font-weight: 800; color: #ffffff;">REFERRAL TIZIMI</span>
+            </div>
+            <div class="referral-text" data-i18n="profile.referral_desc" style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px; line-height: 1.4;">
+                Har bir taklif qilingan do'stingiz uchun balansingizga <b style="color:#ffffff;">300 so'm</b> bonus oling!
+            </div>
+
+            <div class="referral-items" style="display:flex; flex-direction:column; gap:10px; margin-bottom: 18px;">
+                <div class="referral-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(255,255,255,0.03); border-radius:14px; border:1px solid rgba(255,255,255,0.06);">
+                    <div class="referral-item-left" style="display:flex; align-items:center; gap:10px;">
+                        <span class="referral-item-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="16"></line>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                        </span>
+                        <span class="referral-item-text" data-i18n="profile.referral_stars" style="font-size:13px; font-weight:600; color:var(--text-main);">Har bir taklif uchun bonus</span>
+                    </div>
+                    <div class="referral-item-value" style="font-size:14px; font-weight:800; color:#22c55e;">+300 so'm</div>
+                </div>
+
+                <div class="referral-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(255,255,255,0.03); border-radius:14px; border:1px solid rgba(255,255,255,0.06);">
+                    <div class="referral-item-left" style="display:flex; align-items:center; gap:10px;">
+                        <span class="referral-item-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </span>
+                        <span class="referral-item-text" style="font-size:13px; font-weight:600; color:var(--text-main);">Taklif qilinganlar</span>
+                    </div>
+                    <div class="referral-item-value" id="refCount" style="font-size:14px; font-weight:800; color:#ffffff;">0 ta</div>
+                </div>
+
+                <div class="referral-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(255,255,255,0.03); border-radius:14px; border:1px solid rgba(255,255,255,0.06);">
+                    <div class="referral-item-left" style="display:flex; align-items:center; gap:10px;">
+                        <span class="referral-item-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </span>
+                        <span class="referral-item-text" style="font-size:13px; font-weight:600; color:var(--text-main);">Jami ishlangan bonus</span>
+                    </div>
+                    <div class="referral-item-value" id="refBonus" style="font-size:14px; font-weight:800; color:#22c55e;">0 so'm</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="shareReferralDirect()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <span data-i18n="profile.invite_friends">Do'stlarni taklif qilish (+300 so'm)</span>
+            </button>
+        </div>
+
+        <div class="footer-text">@CoinStatuz_bot</div>
+    </div>
+
+    <!-- Settings Custom Glass Modal -->
+    <div class="custom-modal-overlay" id="settingsModalOverlay">
+        <div class="custom-modal-box">
+            <div class="modal-header-row">
+                <div class="modal-title" style="display:flex;align-items:center;gap:8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Sozlamalar</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeSettingsModal()">✕</button>
+            </div>
+
+            <!-- Dark / Light Theme Toggle -->
+            <div class="setting-toggle-row">
+                <div class="setting-row-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <div>
+                        <div class="setting-row-title">Qorong'i rejim (Dark Mode)</div>
+                        <div class="setting-row-subtitle">Tungi va kunduzgi uslub</div>
+                    </div>
+                </div>
+                <label class="switch-toggle">
+                    <input type="checkbox" id="themeToggleCheckbox" onchange="toggleTheme()">
+                    <span class="slider-round"></span>
+                </label>
+            </div>
+
+            <!-- Notifications Toggle -->
+            <div class="setting-toggle-row">
+                <div class="setting-row-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <div>
+                        <div class="setting-row-title">Bildirishnomalar</div>
+                        <div class="setting-row-subtitle">Ovoz va xabarnomalar</div>
+                    </div>
+                </div>
+                <label class="switch-toggle">
+                    <input type="checkbox" checked onchange="tg.showPopup({title:'Bildirishnomalar', message:'Bildirishnoma sozlamalari saqlandi!', buttons:[{type:'ok'}]})">
+                    <span class="slider-round"></span>
+                </label>
+            </div>
+
+            <!-- Language Row -->
+            <div class="setting-toggle-row" onclick="toggleLanguage(); closeSettingsModal();" style="cursor:pointer;">
+                <div class="setting-row-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <div>
+                        <div class="setting-row-title">Tilni o'zgartirish</div>
+                        <div class="setting-row-subtitle"><span data-i18n-lang="profile.lang_">O'zbekcha</span></div>
+                    </div>
+                </div>
+                <span style="font-size:18px; color:var(--text-sub);">›</span>
+            </div>
+
+            <!-- Support Row -->
+            <div class="setting-toggle-row" onclick="openSupport(); closeSettingsModal();" style="cursor:pointer;">
+                <div class="setting-row-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    <div>
+                        <div class="setting-row-title">Qo'llab-quvvatlash</div>
+                        <div class="setting-row-subtitle">Admin bilan bog'lanish</div>
+                    </div>
+                </div>
+                <span style="font-size:18px; color:var(--text-sub);">›</span>
+            </div>
+
+            <!-- Channel Row -->
+            <div class="setting-toggle-row" onclick="openChannel(); closeSettingsModal();" style="cursor:pointer;">
+                <div class="setting-row-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    <div>
+                        <div class="setting-row-title">Yangiliklar kanali</div>
+                        <div class="setting-row-subtitle">Rasmiy Telegram kanal</div>
+                    </div>
+                </div>
+                <span style="font-size:18px; color:var(--text-sub);">›</span>
+            </div>
+
+            <!-- Terms Row -->
+            <div class="setting-toggle-row" onclick="openTermsModal(); closeSettingsModal();" style="cursor:pointer;">
+                <div class="setting-row-left">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    <div>
+                        <div class="setting-row-title">Foydalanish qoidalari</div>
+                        <div class="setting-row-subtitle">Qoidalar va shartlar</div>
+                    </div>
+                </div>
+                <span style="font-size:18px; color:var(--text-sub);">›</span>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- My Gifts Custom Glass Modal -->
+    <div class="custom-modal-overlay" id="myGiftsModalOverlay">
+        <div class="custom-modal-box">
+            <div class="modal-header-row">
+                <div class="modal-title" style="display:flex;align-items:center;gap:8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                        <rect x="2" y="7" width="20" height="5"></rect>
+                        <line x1="12" y1="22" x2="12" y2="7"></line>
+                    </svg>
+                    <span>Mening Giftlarim</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeMyGiftsModal()">✕</button>
+            </div>
+
+            <div style="text-align:center;padding:26px 10px;">
+                <div style="font-size:42px;margin-bottom:10px;">🎁</div>
+                <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:6px;">Giftlar kolleksiyasi</div>
+                <div style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:16px;">Sizga yuborilgan va xarid qilingan barcha Telegram Giftlar va NFT sovg'alaringiz shu yerda saqlanadi.</div>
+            </div>
+
+            <button class="btn-primary" onclick="closeMyGiftsModal(); window.location.href='gift.html';">
+                <span>🎁</span>
+                <span>Yangi Gift xarid qilish</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Yangiliklar va E'lonlar Glass Modal -->
+    <div class="custom-modal-overlay" id="newsModalOverlay">
+        <div class="custom-modal-box" style="text-align: left; max-width: 400px; padding: 20px;">
+            <div class="modal-header-row" style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px;">
+                <div class="modal-title" style="display:flex;align-items:center;gap:8px; font-size: 15px; font-weight: 800; color: var(--accent-sky);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    <span>YANGILIKLAR VA E'LONLAR</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeNewsModal()" style="background:none; border:none; color:var(--text-sub); font-size:18px; cursor:pointer;">✕</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;">
+                <!-- News Item 1 -->
+                <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-card); padding: 14px; border-radius: 16px; cursor: pointer;" onclick="tg.openTelegramLink('https://t.me/CoinStatUz')">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="font-size: 14px; font-weight: 700; color: var(--text-main);">🚀 CoinStat UZ Mini App 2.0 Ishga Tushdi</span>
+                        <span style="font-size: 11px; color: var(--text-sub);">Bugun</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Ilovaning yangi versiyasi tezyurar server va tungi/kunduzgi rejim bilan to'liq yangilandi.</div>
+                </div>
+
+                <!-- News Item 2 -->
+                <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-card); padding: 14px; border-radius: 16px; cursor: pointer;" onclick="tg.openTelegramLink('https://t.me/CoinStatUz')">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="font-size: 14px; font-weight: 700; color: var(--text-main);">🎁 Eksklyuziv Telegram Giftlar va NFTlar</span>
+                        <span style="font-size: 11px; color: var(--text-sub);">Kolleksiya</span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Yangi Special va Royal Star Giftlar do'stlarizga sovg'a yuborishingiz uchun tayyor!</div>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" onclick="tg.openTelegramLink('https://t.me/CoinStatUz')">
+                <span>📢</span>
+                <span>Rasmiy telegram kanalimiz: @CoinStatUz</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Buyurtmalar Tarixi Custom Glass Modal -->
+    <div class="custom-modal-overlay" id="transactionsModalOverlay">
+        <div class="custom-modal-box" style="text-align: left; max-width: 420px; width: 92%; padding: 20px; max-height: 72vh; display: flex; flex-direction: column;">
+            <div class="modal-header-row" style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px;">
+                <div class="modal-title" style="display:flex;align-items:center;gap:8px; font-size: 16px; font-weight: 800; color: var(--text-main);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Buyurtmalar Tarixi</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeTransactionsModal()" style="background:none; border:none; color:var(--text-sub); font-size:18px; cursor:pointer;">✕</button>
+            </div>
+
+            <!-- Modal Tab Switcher -->
+            <div style="display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--border-card); border-radius: 12px; padding: 3px; margin-bottom: 12px; gap: 4px;">
+                <button id="modalTabOrdersBtn" onclick="switchModalTab('orders')" style="flex: 1; padding: 8px 0; border-radius: 9px; border: none; background: var(--accent-sky); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                    🛍️ Buyurtmalar
+                </button>
+                <button id="modalTabBalanceBtn" onclick="switchModalTab('balance')" style="flex: 1; padding: 8px 0; border-radius: 9px; border: none; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                    💳 Balans tarixi
+                </button>
+            </div>
+
+            <div id="modalTransactionsContent" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; min-height: 180px; padding-right: 2px;">
+                <div style="text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 13px;">Yuklanmoqda...</div>
+            </div>
+
+            <div style="margin-top: 12px; text-align: center;">
+                <button onclick="closeTransactionsModal()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-card); color: #ffffff; padding: 8px 24px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;">
+                    ✕ Yopish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden elements for compatibility with balance fetching in common.js -->
+    <div id="balance" style="display:none;">0 so'm</div>
+
+    <!-- Floating Glass Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="openHome()">
+            <div class="nav-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            <div class="nav-label">Asosiy</div>
+        </div>
+
+        <div class="nav-item" onclick="openGifts()">
+            <div class="nav-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
+            </div>
+            <div class="nav-label">Gift</div>
+        </div>
+
+        <div class="nav-item" onclick="openReyting()">
+            <div class="nav-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg>
+            </div>
+            <div class="nav-label">Top</div>
+        </div>
+
+        <div class="nav-item active" onclick="openProfile()">
+            <div class="nav-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="nav-label">Profil</div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        let rawUserId = getUserId();
+
+        function openHome() {
+            window.location.href = 'index.html';
+        }
+
+        function openStars() {
+            window.location.href = 'stars.html';
+        }
+
+        function openPremium() {
+            window.location.href = 'premium.html';
+        }
+
+        function openGifts() {
+            window.location.href = 'gift.html';
+        }
+
+        function openReyting() {
+            window.location.href = 'rating.html';
+        }
+
+        function openProfile() {
+            window.location.href = 'profile.html';
+        }
+
+        function copyUserId() {
+            navigator.clipboard.writeText(rawUserId);
+            tg.showPopup({
+                title: '✅ Nusxalandi',
+                message: 'ID raqam nusxalandi: ' + rawUserId,
+                buttons: [{ type: 'ok' }]
+            });
+        }
+
+        let modalOrdersData = [];
+        let modalBalanceData = [];
+        let modalActiveTab = 'orders';
+
+        function openTransactionsModal() {
+            const modal = document.getElementById('transactionsModalOverlay');
+            if (modal) {
+                modal.classList.add('open');
+                fetchModalTransactions();
+            }
+        }
+
+        function closeTransactionsModal() {
+            const modal = document.getElementById('transactionsModalOverlay');
+            if (modal) modal.classList.remove('open');
+        }
+
+        function switchModalTab(tab) {
+            modalActiveTab = tab;
+            const btnOrders = document.getElementById('modalTabOrdersBtn');
+            const btnBal = document.getElementById('modalTabBalanceBtn');
+            if (btnOrders && btnBal) {
+                if (tab === 'orders') {
+                    btnOrders.style.background = 'var(--accent-sky)';
+                    btnOrders.style.color = '#fff';
+                    btnBal.style.background = 'transparent';
+                    btnBal.style.color = 'var(--text-muted)';
+                } else {
+                    btnBal.style.background = 'var(--accent-sky)';
+                    btnBal.style.color = '#fff';
+                    btnOrders.style.background = 'transparent';
+                    btnOrders.style.color = 'var(--text-muted)';
+                }
+            }
+            renderModalTransactions();
+        }
+
+        function fetchModalTransactions() {
+            const userId = getUserId();
+            const container = document.getElementById('modalTransactionsContent');
+            if (!container) return;
+            if (!userId) {
+                container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:13px;">Foydalanuvchi ma\'lumotlari topilmadi.</div>';
+                return;
+            }
+            container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:13px;">Yuklanmoqda...</div>';
+
+            fetch(getApiBase() + '/api/user/transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': tg.initData || '',
+                },
+                body: JSON.stringify({ telegram_id: userId, initData: tg.initData || '' }),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    modalOrdersData = data.orders || [];
+                    modalBalanceData = data.balance_history || [];
+                    renderModalTransactions();
+                } else {
+                    container.innerHTML = `<div style="text-align:center; color:#ef4444; padding:30px 0; font-size:13px;">${data.error || "Xatolik yuz berdi"}</div>`;
+                }
+            })
+            .catch(() => {
+                container.innerHTML = '<div style="text-align:center; color:#ef4444; padding:30px 0; font-size:13px;">Tarmoqda xatolik yuz berdi.</div>';
+            });
+        }
+
+        function renderModalTransactions() {
+            const container = document.getElementById('modalTransactionsContent');
+            if (!container) return;
+
+            if (modalActiveTab === 'orders') {
+                const validOrders = modalOrdersData.filter(o => {
+                    if (o.product_type === 'topup' || o.product_type === 'balance') return false;
+                    if (o.status === 'cancelled' || o.status === 'failed') return false;
+                    return true;
+                });
+
+                if (validOrders.length === 0) {
+                    container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:13px;">Hozircha xarid qilingan buyurtmalar mavjud emas.</div>';
+                    return;
+                }
+                let html = '';
+                validOrders.forEach(o => {
+                    let icon = '📦', name = 'Xizmat';
+                    if (o.product_type === 'stars') { icon = '⭐'; name = 'Telegram Stars'; }
+                    else if (o.product_type === 'premium') { icon = '💎'; name = 'Telegram Premium'; }
+                    else if (o.product_type === 'gift') { icon = '🎁'; name = 'Telegram Gift'; }
+                    else if (o.product_type === 'phone') { icon = '📱'; name = 'Virtual Nomer'; }
+                    else if (o.product_type === 'topup') { icon = '💰'; name = 'Balans to\'ldirish'; }
+
+                    let stLabel = '⏳ Kutilmoqda', stColor = '#f59e0b';
+                    if (o.status === 'completed' || o.status === 'paid') { stLabel = '✅ Bajarildi'; stColor = '#22c55e'; }
+                    else if (o.status === 'failed' || o.status === 'cancelled') { stLabel = '❌ Bekor qilindi'; stColor = '#ef4444'; }
+
+                    const amt = (o.amount || 0).toLocaleString('uz-UZ');
+                    const qtyText = o.quantity ? ` (${o.quantity} ta)` : '';
+                    const dt = o.created_at ? o.created_at.slice(0, 16).replace('T', ' ') : '';
+
+                    html += `
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-size: 13px; font-weight: 700; color: #fff;">${icon} ${name}${qtyText}</span>
+                                <span style="font-size: 11px; font-weight: 700; color: ${stColor};">${stLabel}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+                                <span>Summa: <b style="color:var(--accent-sky);">${amt} so'm</b></span>
+                                <span>ID: #${o.id}</span>
+                            </div>
+                            <div style="font-size: 10px; color: var(--text-sub); text-align: right;">${dt}</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                if (modalBalanceData.length === 0) {
+                    container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; font-size:13px;">Balans tarixi mavjud emas.</div>';
+                    return;
+                }
+                let html = '';
+                modalBalanceData.forEach(b => {
+                    const isPlus = (b.amount || 0) >= 0;
+                    const sign = isPlus ? '+' : '';
+                    const amtStr = sign + (b.amount || 0).toLocaleString('uz-UZ') + " so'm";
+                    const dt = b.created_at ? b.created_at.slice(0, 16).replace('T', ' ') : '';
+                    const desc = b.reason || (isPlus ? "Balans to'ldirish" : "Xizmat uchun to'lov");
+
+                    html += `
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-card); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 12px; font-weight: 700; color: #fff;">${desc}</div>
+                                <div style="font-size: 10px; color: var(--text-muted);">${dt}</div>
+                            </div>
+                            <div style="font-size: 13px; font-weight: 800; color: ${isPlus ? '#22c55e' : '#ef4444'};">${amtStr}</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settingsModalOverlay').classList.add('open');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModalOverlay').classList.remove('open');
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModalOverlay').classList.add('open');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModalOverlay').classList.remove('open');
+        }
+
+        function openMyGiftsModal() {
+            document.getElementById('myGiftsModalOverlay').classList.add('open');
+        }
+
+        function closeMyGiftsModal() {
+            document.getElementById('myGiftsModalOverlay').classList.remove('open');
+        }
+
+        function openNewsModal() {
+            document.getElementById('newsModalOverlay').classList.add('open');
+        }
+
+        function closeNewsModal() {
+            document.getElementById('newsModalOverlay').classList.remove('open');
+        }
+
+        function openTermsModal() {
+            tg.showPopup({
+                title: '📜 Foydalanish qoidalari',
+                message: 'CoinStat UZ xizmatidan foydalanish shartlari:\n\n1. Barcha to\'lovlar va buyurtmalar avtomatik yoki rasmiy adminlar tomonidan tasdiqlanadi.\n2. Username va to\'lov cheklarini to\'g\'ri kiritishingiz shart.\n3. Savollar va muammolar bo\'yicha admin bilan bog\'laning: @cofeature',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+
+        function openSupport() {
+            tg.openTelegramLink('https://t.me/cofeature');
+        }
+
+        function openChannel() {
+            tg.openTelegramLink('https://t.me/CoinStatUz');
+        }
+
+        function shareReferralDirect() {
+            const userId = getUserId() || '123456';
+            const referralLink = `https://t.me/CoinStatuz_bot?start=${userId}`;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('CoinStat UZ botiga qo\'shiling!')}`);
+        }
+
+        function loadProfileStats() {
+            const userId = getUserId();
+            if (!userId) return;
+
+            rawUserId = String(userId);
+
+            fetch(getApiBase() + '/api/user/transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': tg.initData || '',
+                },
+                body: JSON.stringify({ telegram_id: userId, initData: tg.initData || '' }),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    const allOrders = data.orders || [];
+                    const actualOrders = allOrders.filter(o => o.product_type !== 'topup' && o.product_type !== 'balance' && o.status !== 'cancelled' && o.status !== 'failed');
+                    
+                    document.getElementById('ordersCount').textContent = actualOrders.length;
+                    
+                    let spent = 0;
+                    actualOrders.forEach(o => {
+                        if (o.status === 'completed' || o.status === 'paid') {
+                            spent += (o.amount || 0);
+                        }
+                    });
+                    document.getElementById('totalSpent').textContent = spent > 0 ? spent.toLocaleString('uz-UZ') : '0';
+                }
+            })
+            .catch(() => {});
+
+            // Fetch Referral Stats
+            fetch(getApiBase() + '/api/user/referrals', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': tg.initData || '',
+                },
+                body: JSON.stringify({ telegram_id: userId, initData: tg.initData || '' }),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    const countEl = document.getElementById('refCount');
+                    const bonusEl = document.getElementById('refBonus');
+                    if (countEl) countEl.textContent = (data.referrals_count || 0) + ' ta';
+                    if (bonusEl) bonusEl.textContent = (data.total_bonus || 0).toLocaleString('uz-UZ') + " so'm";
+                }
+            })
+            .catch(() => {});
+        }
+
+        function filterStatsTime(period, btn) {
+            if (btn) {
+                document.querySelectorAll('.stats-pill-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            const userId = getUserId();
+            if (!userId) return;
+
+            fetch(getApiBase() + '/api/user/transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': tg.initData || '',
+                },
+                body: JSON.stringify({ telegram_id: userId, initData: tg.initData || '' }),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok && data.orders) {
+                    const now = new Date();
+                    let filtered = data.orders.filter(o => o.status === 'completed' || o.status === 'paid');
+                    if (period === 'today') {
+                        filtered = filtered.filter(o => {
+                            const d = new Date(o.created_at);
+                            return d.toDateString() === now.toDateString();
+                        });
+                    } else if (period === 'week') {
+                        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        filtered = filtered.filter(o => new Date(o.created_at) >= weekAgo);
+                    } else if (period === 'month') {
+                        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        filtered = filtered.filter(o => new Date(o.created_at) >= monthAgo);
+                    }
+                    let sum = filtered.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+                    document.getElementById('statsPeriodOrders').textContent = filtered.length + ' ta';
+                    document.getElementById('statsPeriodSpent').textContent = sum > 0 ? sum.toLocaleString('uz-UZ') + " so'm" : "0 so'm";
+                }
+            })
+            .catch(() => {});
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfileStats();
+            filterStatsTime('today');
+
+            // Sync balance stat readout
+            const balanceObserver = new MutationObserver(() => {
+                const balText = document.getElementById('balance')?.textContent || '0';
+                const balNum = parseInt(balText.replace(/\D/g, ''), 10) || 0;
+                const statEl = document.getElementById('userBalanceStat');
+                if (statEl) statEl.textContent = balNum > 0 ? balNum.toLocaleString('uz-UZ') : '0';
+            });
+            const balEl = document.getElementById('balance');
+            if (balEl) balanceObserver.observe(balEl, { childList: true, characterData: true, subtree: true });
+        });
+    </script>
+</body>
+
+</html>
