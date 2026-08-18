@@ -4,317 +4,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StarPayUz - Premium</title>
+    <title>CoinStat UZ - Telegram Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="css/style.css?v=10.0">
+    <link rel="stylesheet" href="css/style.css?v=11.0">
     <style>
-        .header {
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0b111d;
+            color: #ffffff;
+            padding: 16px;
+            padding-bottom: 120px;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .premium-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+            margin-top: 4px;
+        }
+
+        .back-btn-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #172133;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .back-btn-circle:active {
+            transform: scale(0.92);
+            background: #1e2c44;
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-title-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        /* Recipient Input Bar */
+        .recipient-bar {
+            background: #111a2c;
+            border: 1px solid #1f2d48;
+            border-radius: 18px;
+            padding: 6px 8px 6px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
 
-        .header-left__image {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-        }
-
-        .balance-badge {
-            color: #ffffff;
-            font-weight: 700;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            background: rgba(13, 19, 34, 0.8);
-            padding: 8px 14px;
-            border-radius: 999px;
-            font-size: 13px;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .page-title {
+        .recipient-input-wrap {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 6px;
+            flex: 1;
         }
 
-        .page-title img {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
+        .recipient-at {
+            color: #64748b;
+            font-size: 16px;
+            font-weight: 600;
         }
 
-        .page-title h2 {
-            color: var(--text-main);
-            font-size: 20px;
-            font-weight: 800;
+        .recipient-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
         }
 
-        .section-label {
-            display: block;
-            color: var(--text-muted);
-            font-size: 13px;
+        .recipient-input::placeholder {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .for-myself-btn {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            outline: none;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 14px;
             font-weight: 700;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
         }
 
-        .premium-plans-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+        .for-myself-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* Premium Tier Cards */
+        .premium-list-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             margin-bottom: 24px;
         }
 
-        .plan-card {
-            background: rgba(13, 19, 34, 0.8);
-            border: 1px solid var(--border-card);
-            border-radius: 18px;
-            padding: 16px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
+        .premium-tier-row {
+            background: #111a2c;
+            border: 1px solid #1f2d48;
+            border-radius: 20px;
+            padding: 16px 18px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .premium-tier-row:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: #141f35;
+        }
+
+        .premium-tier-row.selected {
+            background: #19202c;
+            border: 1.5px solid #a855f7 !important;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .tier-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .tier-star-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: rgba(168, 85, 247, 0.12);
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            font-size: 22px;
         }
 
-        .plan-card:hover, .plan-card.active {
-            border-color: #ffffff !important;
-            background: rgba(255, 255, 255, 0.08) !important;
-            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.15) !important;
-            transform: translateY(-2px);
+        .tier-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .plan-duration {
+        .tier-title {
             font-size: 16px;
             font-weight: 800;
             color: #ffffff;
         }
 
-        .plan-price {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--accent-sky);
+        .tier-price {
+            font-size: 13px;
+            font-weight: 600;
+            color: #94a3b8;
         }
 
-        .plan-badge {
-            font-size: 10px;
+        .tier-badge {
+            font-size: 11px;
             font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 999px;
-            background: rgba(236, 72, 153, 0.2);
-            color: #f472b6;
-            margin-bottom: 2px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            background: rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        /* Bottom Action Bar */
+        .premium-bottom-action {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, transparent 0%, #0b111d 30%, #0b111d 100%);
+            padding: 16px;
+            z-index: 100;
+        }
+
+        .premium-buy-btn {
+            width: 100%;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            padding: 18px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .premium-buy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .premium-buy-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Loader -->
-    <div class="loader-overlay" id="loaderOverlay">
-        <div class="loader-star">
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <img src="./images/loader.webp" alt="Loader">
+    <!-- Header -->
+    <div class="premium-header">
+        <div class="back-btn-circle" onclick="window.location.href='index.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
         </div>
-        <div class="loader-text">CoinStat UZ</div>
-        <div class="loader-sub" data-i18n="loader.sub">Yuklanmoqda...</div>
+        <div class="header-title-box">
+            <div class="header-logo-icon">👑</div>
+            <div class="header-title-text">Telegram Premium</div>
+        </div>
     </div>
 
-    <!-- Top Profile Header Bar (Horizontal Left-Aligned Layout matching reference screenshot) -->
-    <div class="top-header-bar">
-        <div class="top-header-left">
-            <div class="user-avatar-wrap">
-                <img src="" id="avatarImg" style="display:none;" alt="Avatar">
-                <span class="user-avatar-initial" id="avatarPlaceholder">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                        <polyline points="17 6 23 6 23 12"></polyline>
-                    </svg>
-                </span>
-            </div>
-            <div class="user-meta-col">
-                <div class="user-title-name" id="profileName">CoinStat UZ</div>
-                <div class="user-id-row" onclick="copyUserId()" title="Nusxalash">
-                    <span id="profileUserId">ID: —</span>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
+    <!-- Recipient Bar -->
+    <div class="recipient-bar">
+        <div class="recipient-input-wrap">
+            <span class="recipient-at">@</span>
+            <input type="text" id="username" class="recipient-input" placeholder="Foydalanuvchi nomi">
+        </div>
+        <button type="button" class="for-myself-btn" onclick="setMyUsername()">O'zimga</button>
+    </div>
+
+    <!-- Premium Plans -->
+    <div class="premium-list-stack">
+        <!-- 3 Oylik -->
+        <div class="premium-tier-row selected" onclick="selectPremium(3, 140000, this)">
+            <div class="tier-left">
+                <div class="tier-star-icon">⭐️</div>
+                <div class="tier-meta">
+                    <div class="tier-title">3 Oylik Premium</div>
+                    <div class="tier-price">140 000 so'm</div>
                 </div>
             </div>
+            <div class="tier-badge">Oddiy</div>
         </div>
 
-        <button class="lang-pill-btn" onclick="toggleLanguage()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
-            <span data-i18n-lang="profile.lang_">Русский</span>
-            <span style="opacity:0.6; font-size:10px;">v</span>
+        <!-- 6 Oylik -->
+        <div class="premium-tier-row" onclick="selectPremium(6, 210000, this)">
+            <div class="tier-left">
+                <div class="tier-star-icon">💎</div>
+                <div class="tier-meta">
+                    <div class="tier-title">6 Oylik Premium</div>
+                    <div class="tier-price">210 000 so'm</div>
+                </div>
+            </div>
+            <div class="tier-badge">-15% Chegirma</div>
+        </div>
+
+        <!-- 12 Oylik -->
+        <div class="premium-tier-row" onclick="selectPremium(12, 380000, this)">
+            <div class="tier-left">
+                <div class="tier-star-icon">👑</div>
+                <div class="tier-meta">
+                    <div class="tier-title">12 Oylik Premium (1 Yil)</div>
+                    <div class="tier-price">380 000 so'm</div>
+                </div>
+            </div>
+            <div class="tier-badge" style="background: rgba(234, 179, 8, 0.2); color: #facc15; border-color: rgba(234, 179, 8, 0.3);">-30% Eng arzon</div>
+        </div>
+    </div>
+
+    <!-- Bottom Purchase Bar -->
+    <div class="premium-bottom-action">
+        <button type="button" class="premium-buy-btn" id="buyPremiumBtn" onclick="executeBuyPremium()">
+            <span>Sotib olish (140 000 so'm)</span>
         </button>
-    </div>
-
-    <!-- Hero Balans Card -->
-    <div class="hero-balance-card">
-        <div class="balance-card-label">BALANS</div>
-        <div class="balance-card-amount">
-            <span id="balance">0 so'm</span>
-        </div>
-        <div class="balance-card-actions">
-            <button class="balance-stars-pill" onclick="openStars()">
-                <span>⭐</span>
-                <span>≈ <span id="starsEquivalent">0</span> Stars</span>
-                <span style="opacity:0.7;">→</span>
-            </button>
-            <button class="balance-topup-btn" onclick="window.location.href='topup.html'">
-                <span>+</span>
-                <span>To'ldirish</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs-container">
-        <div class="tabs">
-            <button class="tab" onclick="openStars()" data-i18n="stars.tab">Stars olish</button>
-            <button class="tab active" data-i18n="premium.tab">Premium olish</button>
-        </div>
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-        <div class="page-title">
-            <img src="./images/premium.webp" alt="Premium">
-            <h2 data-i18n="premium.title">Premium sotib olish</h2>
-        </div>
-
-        <!-- Username Input -->
-        <h3 class="section-label" data-i18n="common.recipient">Qabul qiluvchi</h3>
-        <div class="input-wrapper">
-            <img src="./images/user.webp" class="inside-icon" alt="User">
-            <input type="text" id="username" data-i18n-placeholder="common.enter_username" placeholder="Username kiriting" class="input">
-        </div>
-
-        <!-- Premium Duration Select Cards -->
-        <h3 class="section-label" data-i18n="premium.duration">Davomiylik</h3>
-        
-        <div class="premium-plans-grid">
-            <div class="plan-card" onclick="selectPlan(3, 160000, this)">
-                <span class="plan-badge">Standard</span>
-                <div class="plan-duration">3 OY</div>
-                <div class="plan-price">160K UZS</div>
-            </div>
-            <div class="plan-card active" onclick="selectPlan(6, 225000, this)">
-                <span class="plan-badge">🔥 Popular</span>
-                <div class="plan-duration">6 OY</div>
-                <div class="plan-price">225K UZS</div>
-            </div>
-            <div class="plan-card" onclick="selectPlan(12, 380000, this)">
-                <span class="plan-badge">💎 Best Value</span>
-                <div class="plan-duration">12 OY</div>
-                <div class="plan-price">380K UZS</div>
-            </div>
-        </div>
-
-        <input type="hidden" id="premiumSelect" value="6-225000">
-
-        <!-- Buy Button -->
-        <button class="btn-primary" id="buyBtn" onclick="buyPremium()">Sotib olish</button>
-    </div>
-
-    <!-- Floating Glass Bottom Navigation -->
-    <div class="bottom-nav">
-        <div class="nav-item" onclick="openHome()">
-            <div class="nav-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            </div>
-            <div class="nav-label">Asosiy</div>
-        </div>
-
-        <div class="nav-item" onclick="openGifts()">
-            <div class="nav-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line></svg>
-            </div>
-            <div class="nav-label">Gift</div>
-        </div>
-
-        <div class="nav-item" onclick="openReyting()">
-            <div class="nav-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg>
-            </div>
-            <div class="nav-label">Top</div>
-        </div>
-
-        <div class="nav-item" onclick="openProfile()">
-            <div class="nav-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </div>
-            <div class="nav-label">Profil</div>
-        </div>
     </div>
 
     <script src="js/common.js"></script>
     <script>
-        let selectedMonths = 6;
-        let selectedPrice = 225000;
+        const tg = window.Telegram?.WebApp || {};
+        try { tg.expand?.(); tg.ready?.(); } catch (e) {}
 
-        function selectPlan(months, price, cardEl) {
+        let selectedMonths = 3;
+        let selectedPrice = 140000;
+
+        function setMyUsername() {
+            const user = tg.initDataUnsafe?.user;
+            const input = document.getElementById('username');
+            if (input) {
+                if (user && user.username) input.value = user.username;
+                else if (user && user.id) input.value = user.id;
+                else input.value = 'men';
+            }
+        }
+
+        function selectPremium(months, price, el) {
             selectedMonths = months;
             selectedPrice = price;
-            document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
-            if (cardEl) cardEl.classList.add('active');
-            document.getElementById('buyBtn').disabled = false;
+
+            document.querySelectorAll('.premium-tier-row').forEach(r => r.classList.remove('selected'));
+            if (el) el.classList.add('selected');
+
+            const btn = document.getElementById('buyPremiumBtn');
+            if (btn) {
+                btn.innerHTML = `<span>Sotib olish (${price.toLocaleString('uz-UZ')} so'm)</span>`;
+            }
         }
 
-        function buyPremium() {
-            if (selectedMonths === 0) {
-                tg.showAlert('Iltimos, davomiylikni tanlang!');
+        async function executeBuyPremium() {
+            let uVal = (document.getElementById('username')?.value || '').trim().replace(/^@/, '');
+            if (!uVal) {
+                const tgUser = tg.initDataUnsafe?.user;
+                if (tgUser?.username) uVal = tgUser.username;
+            }
+
+            if (!uVal) {
+                if (tg.showAlert) tg.showAlert('Iltimos, Telegram foydalanuvchi nomini kiriting!');
+                else alert('Iltimos, Telegram foydalanuvchi nomini kiriting!');
                 return;
             }
 
-            const username = getUsername('username');
-            if (!username) {
-                tg.showAlert('Iltimos, username kiriting!');
-                return;
+            const btn = document.getElementById('buyPremiumBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ Yuborilmoqda...</span>';
+
+            const userId = getUserId();
+            const apiBase = getApiBase();
+
+            try {
+                const res = await fetch((apiBase ? apiBase : '') + '/api/order/premium', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Telegram-Init-Data': tg.initData || '',
+                    },
+                    body: JSON.stringify({
+                        telegram_id: userId,
+                        username: uVal,
+                        months: selectedMonths,
+                        amount: selectedPrice,
+                        initData: tg.initData || ''
+                    })
+                });
+
+                const data = await res.json();
+                if (data && data.ok) {
+                    if (tg.showAlert) {
+                        tg.showAlert(`✅ ${selectedMonths} oylik Telegram Premium muvaffaqiyatli xarid qilindi!`);
+                    } else {
+                        alert(`✅ ${selectedMonths} oylik Telegram Premium muvaffaqiyatli xarid qilindi!`);
+                    }
+                    setTimeout(() => {
+                        window.location.href = 'orders.html';
+                    }, 1000);
+                } else {
+                    const err = data?.error || 'Premium xarid qilishda xatolik yuz berdi.';
+                    if (tg.showAlert) tg.showAlert(err);
+                    else alert(err);
+                }
+            } catch (err) {
+                if (tg.showAlert) tg.showAlert('Serverga ulanishda xatolik: ' + err.message);
+                else alert('Serverga ulanishda xatolik: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Sotib olish (${selectedPrice.toLocaleString('uz-UZ')} so'm)</span>`;
             }
-
-            submitOrder({
-                action: 'buy_premium',
-                duration: selectedMonths,
-                price: selectedPrice,
-                username: username
-            });
         }
 
-        function openHome() {
-            window.location.href = 'index.html';
-        }
-
-        function openStars() {
-            window.location.href = 'stars.html';
-        }
-
-        function openGifts() {
-            window.location.href = 'gift.html';
-        }
-
-        function openReyting() {
-            window.location.href = 'rating.html';
-        }
-
-        function openProfile() {
-            window.location.href = 'profile.html';
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            setMyUsername();
+            loadUserBalance();
+        });
     </script>
 </body>
 

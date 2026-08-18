@@ -266,6 +266,15 @@ app.all('/api/user/referrals', async (req, res) => {
   }
 });
 
+// Order endpoints
+const starsOrderHandler = require('./api/order/stars.js');
+const topupOrderHandler = require('./api/order/topup.js');
+const giftOrderHandler = require('./api/order/gift.js');
+
+app.all('/api/order/stars', (req, res) => starsOrderHandler(req, res));
+app.all('/api/order/topup', (req, res) => topupOrderHandler(req, res));
+app.all('/api/order/gift', (req, res) => giftOrderHandler(req, res));
+
 // 5. Serve static WebApp files
 app.use(express.static(path.join(__dirname)));
 app.use('/webapp', express.static(path.join(__dirname, 'webapp')));
