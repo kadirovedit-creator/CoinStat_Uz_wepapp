@@ -1,4 +1,3 @@
-# StarPayUz Web App
 
 Web App pages for StarPayUz Telegram bot.
 
