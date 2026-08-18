@@ -1429,27 +1429,30 @@ async def admin_approve_topup_cb(callback: CallbackQuery):
     lock_key = str(order_id) if order_id else f"{user_id}_{amount}"
     if lock_key in _processing_orders:
         await callback.answer("⚠️ Ushbu to'lov allaqachon tasdiqlanmoqda yoki tasdiqlangan!", show_alert=True)
+        try:
+            await callback.message.edit_reply_markup(reply_markup=None)
+        except Exception:
+            pass
         return
+
+    _processing_orders.add(lock_key)
+
+    # Immediately remove buttons from message so user cannot click again
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
 
     # Check database status
     if order_id:
         existing_order = await db.get_order(order_id)
         if existing_order and existing_order.get("status") in ("completed", "paid"):
             await callback.answer("⚠️ Ushbu to'lov allaqachon tasdiqlangan!", show_alert=True)
-            try:
-                await callback.message.edit_reply_markup(reply_markup=None)
-            except Exception:
-                pass
             return
         elif existing_order and existing_order.get("status") in ("rejected", "cancelled"):
             await callback.answer("⚠️ Ushbu to'lov allaqachon rad etilgan!", show_alert=True)
-            try:
-                await callback.message.edit_reply_markup(reply_markup=None)
-            except Exception:
-                pass
             return
 
-    _processing_orders.add(lock_key)
     await callback.answer("⏳ To'lov tasdiqlanmoqda...")
 
     try:
