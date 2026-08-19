@@ -156,6 +156,138 @@
             background: #e4e4e7;
         }
 
+        /* Custom Quantity Card */
+        .custom-stars-card {
+            background: #141418;
+            border: 1px solid #222228;
+            border-radius: 22px;
+            padding: 18px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .custom-stars-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .custom-stars-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .custom-stars-sub {
+            font-size: 11px;
+            font-weight: 600;
+            color: #71717a;
+            margin-top: 1px;
+        }
+
+        .custom-star-calc-badge {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #f59e0b;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 999px;
+            letter-spacing: 0.2px;
+        }
+
+        .custom-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .custom-input-wrap {
+            flex: 1;
+            background: #0c0d10;
+            border: 1px solid #27272a;
+            border-radius: 14px;
+            padding: 11px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: border-color 0.2s;
+        }
+
+        .custom-input-wrap:focus-within {
+            border-color: #f59e0b;
+        }
+
+        .custom-star-field {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 800;
+            width: 100%;
+        }
+
+        .custom-input-suffix {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #a1a1aa;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .custom-buy-btn {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .custom-buy-btn:active {
+            transform: scale(0.96);
+            background: #e4e4e7;
+        }
+
+        .custom-quick-chips {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .custom-quick-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quick-chip-btn {
+            background: #1e1f24;
+            border: 1px solid #2e2f38;
+            color: #a1a1aa;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .quick-chip-btn:active, .quick-chip-btn.active {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            color: #ffffff;
+        }
+
         /* Recipient Input */
         .recipient-dark-bar {
             background: #141418;
@@ -300,6 +432,41 @@
         </div>
     </div>
 
+    <!-- Custom Stars Amount Card -->
+    <div class="custom-stars-card">
+        <div class="custom-stars-top">
+            <div>
+                <div class="custom-stars-title">Boshqa miqdor</div>
+                <div class="custom-stars-sub">Ixtiyoriy miqdorni kiriting (min 50)</div>
+            </div>
+            <div class="custom-star-calc-badge">
+                <span id="customPricePreview">9 500</span> UZS
+            </div>
+        </div>
+
+        <div class="custom-input-row">
+            <div class="custom-input-wrap">
+                <input type="number" id="customStarInput" class="custom-star-field" placeholder="Masalan: 75" min="50" max="100000" value="50" oninput="calcCustomStarPrice()">
+                <div class="custom-input-suffix">
+                    <img src="images/star.webp" alt="Star" class="star-badge-icon" style="width: 18px; height: 18px;">
+                    <span>Stars</span>
+                </div>
+            </div>
+            <button class="custom-buy-btn" id="customBuyBtn" onclick="buyCustomStars(this)">
+                Sotib olish
+            </button>
+        </div>
+
+        <div class="custom-quick-chips">
+            <button type="button" class="quick-chip-btn" onclick="setQuickStars(50)">50</button>
+            <button type="button" class="quick-chip-btn" onclick="setQuickStars(150)">150</button>
+            <button type="button" class="quick-chip-btn" onclick="setQuickStars(250)">250</button>
+            <button type="button" class="quick-chip-btn" onclick="setQuickStars(750)">750</button>
+            <button type="button" class="quick-chip-btn" onclick="setQuickStars(2500)">2 500</button>
+            <button type="button" class="quick-chip-btn" onclick="setQuickStars(5000)">5 000</button>
+        </div>
+    </div>
+
     <!-- Recipient Input -->
     <div class="recipient-dark-bar">
         <input type="text" id="username" class="recipient-dark-input" placeholder="@username">
@@ -392,9 +559,41 @@
             }
         }
 
+        function calcCustomStarPrice() {
+            const input = document.getElementById('customStarInput');
+            const preview = document.getElementById('customPricePreview');
+            let qty = parseInt(input?.value || '0', 10);
+            if (isNaN(qty) || qty < 1) qty = 0;
+            const price = qty * 190;
+            if (preview) preview.textContent = price.toLocaleString('uz-UZ');
+            return { qty, price };
+        }
+
+        function setQuickStars(qty) {
+            const input = document.getElementById('customStarInput');
+            if (input) {
+                input.value = qty;
+                calcCustomStarPrice();
+            }
+            document.querySelectorAll('.quick-chip-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.textContent.replace(/\s/g, ''), 10) === qty);
+            });
+        }
+
+        async function buyCustomStars(btn) {
+            const { qty, price } = calcCustomStarPrice();
+            if (qty < 50) {
+                if (tg?.showAlert) tg.showAlert('Minimal Telegram Stars miqdori: 50 Stars');
+                else alert('Minimal Telegram Stars miqdori: 50 Stars');
+                return;
+            }
+            await buyStarTier(qty, price, btn);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             setMyUsername();
             loadUserBalance();
+            calcCustomStarPrice();
         });
     </script>
 </body>
