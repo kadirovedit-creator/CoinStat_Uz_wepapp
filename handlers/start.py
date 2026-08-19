@@ -35,17 +35,12 @@ def get_welcome_text(user: dict | None, username: str | None, first_name: str | 
     default_name = "Пользователь" if lang == "ru" else "Foydalanuvchi"
     display = f"@{username}" if username else (first_name or default_name)
     sp_id = user_dict.get("sp_id") or user_dict.get("id", "—")
-    balance = user_dict.get("balance", 0) or 0
     referrals = user_dict.get("referrals", 0) or 0
-
-    balance_line_ru = f'┗ <tg-emoji emoji-id="{EMOJI_WALLET}">👛</tg-emoji> <b>Баланс:</b> {balance:,.0f} сум\n' if balance > 0 else ""
-    balance_line_uz = f'┗ <tg-emoji emoji-id="{EMOJI_WALLET}">👛</tg-emoji> <b>Balans:</b> {balance:,.0f} so\'m\n' if balance > 0 else ""
 
     if lang == "ru":
         return (
             f'<tg-emoji emoji-id="{EMOJI_WAVE}">👋</tg-emoji> <b>Здравствуйте, {display}</b>\n\n'
             f'<tg-emoji emoji-id="{EMOJI_ORANGE}">🟠</tg-emoji> <b>CoinStat UZ ID:</b> <code>{sp_id}</code>\n'
-            f'{balance_line_ru}'
             f'┗ <tg-emoji emoji-id="{EMOJI_PEOPLE}">👥</tg-emoji> <b>Рефералы:</b> {referrals} чел\n\n'
             f'<blockquote><b>Выберите нужный раздел:</b></blockquote>'
         )
@@ -53,7 +48,6 @@ def get_welcome_text(user: dict | None, username: str | None, first_name: str | 
     return (
         f'<tg-emoji emoji-id="{EMOJI_WAVE}">👋</tg-emoji> <b>Assalomu alaykum, {display}</b>\n\n'
         f'<tg-emoji emoji-id="{EMOJI_ORANGE}">🟠</tg-emoji> <b>CoinStat UZ ID:</b> <code>{sp_id}</code>\n'
-        f'{balance_line_uz}'
         f'┗ <tg-emoji emoji-id="{EMOJI_PEOPLE}">👥</tg-emoji> <b>Referallar:</b> {referrals} ta\n\n'
         f'<blockquote><b>Kerakli bo\'limni tanlang:</b></blockquote>'
     )
