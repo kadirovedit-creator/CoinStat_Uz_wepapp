@@ -356,7 +356,7 @@ async def admin_approve_receipt(callback: CallbackQuery, bot: Bot):
             f"👛 <b>+{amount:,} so'm</b> balansingizga qo'shildi!\n"
             f"💰 Hozirgi balans: <b>{new_balance:,} so'm</b>",
             parse_mode="HTML",
-            reply_markup=keyboards.get_webapp_main_keyboard(telegram_id)
+            reply_markup=keyboards.get_webapp_main_keyboard(telegram_id, balance=new_balance)
         )
     except Exception as e:
         logger.error("Failed to notify user %s: %s", telegram_id, e)

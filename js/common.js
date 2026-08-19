@@ -179,23 +179,24 @@ function loadUserBalance() {
         return;
     }
 
-    // Initial instant optimistic render (ONLY ONCE ON FIRST LOAD)
-    if (!_initialBalRendered) {
-        _initialBalRendered = true;
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlBal = urlParams.get('bal') || urlParams.get('balance');
-            if (urlBal !== null && !isNaN(parseInt(urlBal, 10))) {
-                setBalUI(parseInt(urlBal, 10));
-            } else {
-                const cachedBal = localStorage.getItem('starpay_balance_' + userId);
-                if (cachedBal !== null) {
-                    setBalUI(parseInt(cachedBal, 10) || 0);
-                }
+    // 1. Immediately read from URL if present
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlBal = urlParams.get('bal') || urlParams.get('balance');
+        if (urlBal !== null && !isNaN(parseInt(urlBal, 10))) {
+            const numBal = parseInt(urlBal, 10);
+            setBalUI(numBal);
+            try { localStorage.setItem('starpay_balance_' + userId, String(numBal)); } catch(e) {}
+        } else {
+            // 2. Read from localStorage cache
+            const cachedBal = localStorage.getItem('starpay_balance_' + userId);
+            if (cachedBal !== null && !isNaN(parseInt(cachedBal, 10))) {
+                setBalUI(parseInt(cachedBal, 10));
             }
-        } catch(e) {}
-    }
+        }
+    } catch(e) {}
 
+    // 3. Query API for live balance update
     const apiBase = getApiBase();
     const fetchBalance = (url) => {
         return fetch(url, {
@@ -205,36 +206,21 @@ function loadUserBalance() {
                 'X-Telegram-Init-Data': tg.initData || '',
             },
             body: JSON.stringify({ telegram_id: userId, initData: tg.initData || '' }),
-        }).then(r => r.json());
+        }).then(r => {
+            if (!r.ok) throw new Error('API status ' + r.status);
+            return r.json();
+        });
     };
 
     fetchBalance((apiBase ? apiBase : '') + '/api/user/balance?t=' + Date.now())
     .then(data => {
-        if (data && data.ok && data.balance !== undefined) {
+        if (data && data.ok && typeof data.balance === 'number') {
             const newBal = Number(data.balance);
             setBalUI(newBal);
             try { localStorage.setItem('starpay_balance_' + userId, String(newBal)); } catch(e) {}
-        } else if (apiBase !== '') {
-            return fetchBalance('/api/user/balance?t=' + Date.now()).then(data2 => {
-                if (data2 && data2.ok && data2.balance !== undefined) {
-                    const newBal = Number(data2.balance);
-                    setBalUI(newBal);
-                    try { localStorage.setItem('starpay_balance_' + userId, String(newBal)); } catch(e) {}
-                }
-            });
         }
     })
-    .catch(() => {
-        fetchBalance('/api/user/balance?t=' + Date.now())
-        .then(data2 => {
-            if (data2 && data2.ok && data2.balance !== undefined) {
-                const newBal = Number(data2.balance);
-                setBalUI(newBal);
-                try { localStorage.setItem('starpay_balance_' + userId, String(newBal)); } catch(e) {}
-            }
-        })
-        .catch(() => {});
-    });
+    .catch(() => {});
 }
 
 
