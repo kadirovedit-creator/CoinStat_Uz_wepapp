@@ -469,18 +469,47 @@
             }
         }
 
+        function getAvatarUrl(item, currentUserId) {
+            if (!item) return './images/logo.png';
+            const tgUser = tg?.initDataUnsafe?.user;
+            const rawUsername = String(item.username || '').replace(/^@/, '').toLowerCase();
+            const tgUsername = String(tgUser?.username || '').replace(/^@/, '').toLowerCase();
+            const isMe = (String(item.telegram_id) === String(currentUserId)) || (tgUsername && rawUsername === tgUsername);
+
+            if (isMe && tgUser?.photo_url) {
+                return tgUser.photo_url;
+            }
+            if (item.photo_url) return item.photo_url;
+            if (item.avatar_url) return item.avatar_url;
+
+            const letter = (item.username || item.full_name || 'U').replace(/^@/, '')[0]?.toUpperCase() || 'U';
+            const colors = ['2563eb', '7c3aed', 'db2777', 'ea580c', '059669', '0284c7'];
+            const color = colors[Math.abs(Number(item.telegram_id || 0)) % colors.length] || '2563eb';
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(letter)}&background=${color}&color=fff&bold=true&rounded=true&size=128`;
+        }
+
         function renderPodiumAndList(list, currentUserId) {
             const container = document.getElementById('leaderboardList');
+            const av1 = document.getElementById('podiumAvatar1');
+            const av2 = document.getElementById('podiumAvatar2');
+            const av3 = document.getElementById('podiumAvatar3');
+            const myAv = document.getElementById('myAvatarImg');
+
+            if (myAv && tg.initDataUnsafe?.user?.photo_url) {
+                myAv.src = tg.initDataUnsafe.user.photo_url;
+            }
 
             // 1st Place (Center)
             if (list[0] && list[0].total > 0) {
                 document.getElementById('podiumUser1').textContent = '@' + (list[0].username || 'User#' + list[0].telegram_id);
                 document.getElementById('podiumAmount1').textContent = Number(list[0].total).toLocaleString('uz-UZ') + ' UZS';
                 document.getElementById('podium1').style.opacity = '1';
+                if (av1) av1.src = getAvatarUrl(list[0], currentUserId);
             } else {
                 document.getElementById('podiumUser1').textContent = 'Bo\'sh';
                 document.getElementById('podiumAmount1').textContent = '0 UZS';
                 document.getElementById('podium1').style.opacity = '0.5';
+                if (av1) av1.src = './images/logo.png';
             }
 
             // 2nd Place (Left)
@@ -488,10 +517,12 @@
                 document.getElementById('podiumUser2').textContent = '@' + (list[1].username || 'User#' + list[1].telegram_id);
                 document.getElementById('podiumAmount2').textContent = Number(list[1].total).toLocaleString('uz-UZ') + ' UZS';
                 document.getElementById('podium2').style.opacity = '1';
+                if (av2) av2.src = getAvatarUrl(list[1], currentUserId);
             } else {
                 document.getElementById('podiumUser2').textContent = 'Bo\'sh';
                 document.getElementById('podiumAmount2').textContent = '0 UZS';
                 document.getElementById('podium2').style.opacity = '0.5';
+                if (av2) av2.src = './images/logo.png';
             }
 
             // 3rd Place (Right)
@@ -499,10 +530,12 @@
                 document.getElementById('podiumUser3').textContent = '@' + (list[2].username || 'User#' + list[2].telegram_id);
                 document.getElementById('podiumAmount3').textContent = Number(list[2].total).toLocaleString('uz-UZ') + ' UZS';
                 document.getElementById('podium3').style.opacity = '1';
+                if (av3) av3.src = getAvatarUrl(list[2], currentUserId);
             } else {
                 document.getElementById('podiumUser3').textContent = 'Bo\'sh';
                 document.getElementById('podiumAmount3').textContent = '0 UZS';
                 document.getElementById('podium3').style.opacity = '0.5';
+                if (av3) av3.src = './images/logo.png';
             }
 
             // Remaining list rows (from #4 onwards)
@@ -516,6 +549,7 @@
                 const uname = rawUsername ? '@' + rawUsername : 'User#' + (item.telegram_id || (i + 1));
                 const totalVal = Number(item.total || 0);
                 const totalFormatted = totalVal.toLocaleString('uz-UZ') + ' UZS';
+                const rowAvatar = getAvatarUrl(item, currentUserId);
 
                 const tgUsername = (tg.initDataUnsafe?.user?.username || '').replace(/^@/, '');
                 if (String(item.telegram_id) === currentUserId || (tgUsername && rawUsername.toLowerCase() === tgUsername.toLowerCase())) {
@@ -529,7 +563,7 @@
                             <div class="leader-row-left">
                                 <div class="leader-row-rank">#${rank}</div>
                                 <div class="leader-row-avatar">
-                                    <img src="./images/logo.png" alt="${uname}">
+                                    <img src="${rowAvatar}" alt="${uname}" onerror="this.src='./images/logo.png'">
                                 </div>
                                 <div class="leader-row-username">${uname}</div>
                             </div>
