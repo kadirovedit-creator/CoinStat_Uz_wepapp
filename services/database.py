@@ -370,6 +370,9 @@ async def ensure_user(
             """
             INSERT INTO users (telegram_id, sp_id, username, full_name, referred_by)
             VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (telegram_id) DO UPDATE SET
+                username = COALESCE(EXCLUDED.username, users.username),
+                full_name = COALESCE(EXCLUDED.full_name, users.full_name)
             """,
             telegram_id, new_sp, username, full_name, referred_by,
         )
@@ -378,6 +381,9 @@ async def ensure_user(
             """
             INSERT INTO users (telegram_id, username, full_name, referred_by)
             VALUES ($1, $2, $3, $4)
+            ON CONFLICT (telegram_id) DO UPDATE SET
+                username = COALESCE(EXCLUDED.username, users.username),
+                full_name = COALESCE(EXCLUDED.full_name, users.full_name)
             """,
             telegram_id, username, full_name, referred_by,
         )

@@ -67,7 +67,8 @@ async def is_user_subscribed(bot: Bot, user_id: int) -> bool:
         return False
     except Exception as e:
         logger.warning("Could not check subscription for user %s: %s", user_id, e)
-        return False
+        # If bot is not admin in channel, don't lock all users out
+        return True
 
 
 def get_subscription_keyboard(lang: str = "uz") -> InlineKeyboardMarkup:
