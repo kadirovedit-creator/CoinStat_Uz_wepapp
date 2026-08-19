@@ -11,6 +11,11 @@ logger = logging.getLogger(__name__)
 
 # SQLite requires check_same_thread=False for FastAPI
 _engine_url = DATABASE_URL
+if _engine_url.startswith("postgres://"):
+    _engine_url = _engine_url.replace("postgres://", "postgresql://", 1)
+if "channel_binding" in _engine_url:
+    _engine_url = _engine_url.replace("&channel_binding=require", "").replace("channel_binding=require&", "").replace("?channel_binding=require", "")
+
 connect_args = {}
 if _engine_url.startswith("sqlite"):
     connect_args["check_same_thread"] = False

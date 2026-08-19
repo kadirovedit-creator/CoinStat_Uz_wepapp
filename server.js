@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Database connection
-const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_whMk3x5XVFTz@ep-aged-voice-ax3rogww-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require';
+const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_FOH4kIY9gEte@ep-dawn-pond-axw9wntv-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require';
 const pool = new Pool({
   connectionString,
   ssl: { rejectUnauthorized: false },
@@ -288,15 +288,5 @@ app.listen(PORT, '0.0.0.0', async () => {
   console.log(`📡 URL: http://localhost:${PORT}`);
   console.log(`⚡ PostgreSQL connected to NeonDB`);
   console.log(`========================================`);
-
-  // Perform database fresh reset on launch
-  try {
-    const r1 = await pool.query('UPDATE users SET balance = 0');
-    try { await pool.query('DELETE FROM orders'); } catch (e) {}
-    try { await pool.query('DELETE FROM balance_history'); } catch (e) {}
-    try { await pool.query('DELETE FROM transactions'); } catch (e) {}
-    console.log(`✨ Fresh database reset: ${r1.rowCount} users reset to 0 balance, orders & rating reset to 0!`);
-  } catch (e) {
-    console.error('Initial reset error:', e.message);
-  }
 });
+

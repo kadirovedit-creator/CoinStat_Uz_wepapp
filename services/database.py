@@ -4,11 +4,14 @@ import logging
 import os
 import re
 from typing import Any
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 # Read DATABASE_URL from env (default to sqlite:///database.db if not postgres)
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_FOH4kIY9gEte@ep-dawn-pond-axw9wntv-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require")
 if DATABASE_URL:
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -20,14 +23,15 @@ _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SQLITE_DB_PATH = os.environ.get("SQLITE_DB_PATH", os.path.join(_base_dir, "database.db"))
 
 
+
 # Global pool / connection
 _pg_pool = None
 _sqlite_conn = None
 
 
-def _format_sql(sql: str) -> str:
+def _format_sql(sql: str, is_sqlite: bool = False) -> str:
     """Format SQL query for SQLite vs Postgres"""
-    if not IS_SQLITE:
+    if not is_sqlite:
         return sql
     # Replace $1, $2... with ?
     sql = re.sub(r'\$\d+', '?', sql)
@@ -56,7 +60,7 @@ class DBConnection:
 
     async def execute(self, sql: str, *args) -> str:
 
-        formatted_sql = _format_sql(sql)
+        formatted_sql = _format_sql(sql, self.is_sqlite)
         if self.is_sqlite:
             import aiosqlite
             async with aiosqlite.connect(self.sqlite_db) as db:
@@ -74,7 +78,7 @@ class DBConnection:
                 return await conn.execute(formatted_sql, *args)
 
     async def fetchrow(self, sql: str, *args) -> dict[str, Any] | None:
-        formatted_sql = _format_sql(sql)
+        formatted_sql = _format_sql(sql, self.is_sqlite)
         if self.is_sqlite:
             import aiosqlite
             async with aiosqlite.connect(self.sqlite_db) as db:
@@ -88,7 +92,7 @@ class DBConnection:
                 return dict(row) if row else None
 
     async def fetch(self, sql: str, *args) -> list[dict[str, Any]]:
-        formatted_sql = _format_sql(sql)
+        formatted_sql = _format_sql(sql, self.is_sqlite)
         if self.is_sqlite:
             import aiosqlite
             async with aiosqlite.connect(self.sqlite_db) as db:
@@ -102,10 +106,11 @@ class DBConnection:
                 return [dict(r) for r in rows]
 
     async def fetchval(self, sql: str, *args) -> Any:
-        formatted_sql = _format_sql(sql)
+        formatted_sql = _format_sql(sql, self.is_sqlite)
         if self.is_sqlite:
             import aiosqlite
             async with aiosqlite.connect(self.sqlite_db) as db:
+                db.row_factory = aiosqlite.Row
                 async with db.execute(formatted_sql, args) as cursor:
                     row = await cursor.fetchone()
                     return row[0] if row else None
@@ -122,8 +127,16 @@ async def get_pool():
 
 
 async def init_db() -> None:
+    global _pg_pool, db_conn, IS_SQLITE, DATABASE_URL
+    DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://neondb_owner:npg_FOH4kIY9gEte@ep-dawn-pond-axw9wntv-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require")
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    if "channel_binding" in DATABASE_URL:
+        DATABASE_URL = DATABASE_URL.replace("&channel_binding=require", "").replace("channel_binding=require&", "").replace("?channel_binding=require", "")
 
-    global _pg_pool, db_conn
+    IS_SQLITE = not (DATABASE_URL and DATABASE_URL.startswith("postgres"))
+    db_conn.is_sqlite = IS_SQLITE
+
     if not IS_SQLITE:
         import asyncpg
         _pg_pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
