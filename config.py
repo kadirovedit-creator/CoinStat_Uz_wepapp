@@ -63,7 +63,7 @@ EMOJI_TROPHY = os.getenv("EMOJI_TROPHY", "5341354194118942558")         # 🏆
 EMOJI_RING = os.getenv("EMOJI_RING", "5345797174577897195")             # 💍
 
 # Orders notification channel
-CHANNEL_ORDERS = os.getenv("CHANNEL_ORDERS", "@ChannelOrders")
+CHANNEL_ORDERS = os.getenv("CHANNEL_ORDERS", "@coinstatuz_org")
 CUSTOM_EMOJI_DOWN = os.getenv("CUSTOM_EMOJI_DOWN", "5229212516415978792")      # ⬇️
 CUSTOM_EMOJI_UP = os.getenv("CUSTOM_EMOJI_UP", "5229113938326599381")          # ⬆️
 CUSTOM_EMOJI_ID = os.getenv("CUSTOM_EMOJI_ID", "5818885490065017876")          # 🆔
