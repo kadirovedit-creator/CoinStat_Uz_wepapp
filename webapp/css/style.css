@@ -21,9 +21,80 @@
   --text-muted: #8e98a8;
   --text-sub: #64748b;
 
-  --nav-bg: rgba(18, 20, 28, 0.95);
+  --nav-bg: rgba(20, 23, 36, 0.95);
   --nav-border: rgba(255, 255, 255, 0.1);
   --font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+/* =========================================
+   Floating Pill Capsule Dock Bottom Navigation 
+   ========================================= */
+.bottom-dock-nav {
+    position: fixed;
+    bottom: 18px;
+    left: 18px;
+    right: 18px;
+    background: #141724;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 999px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 999;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dock-tab-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    color: #838a9f;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    transition: all 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    flex: 1;
+}
+
+.dock-tab-btn svg {
+    width: 22px;
+    height: 22px;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dock-tab-btn span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    transition: all 0.2s ease;
+}
+
+/* Active Capsule Pill with Vibrant Blue Glow */
+.dock-tab-btn.active {
+    background: #2b59ff;
+    color: #ffffff;
+    box-shadow: 0 4px 18px rgba(43, 89, 255, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.dock-tab-btn.active svg {
+    transform: scale(1.08);
+}
+
+.dock-tab-btn.active span {
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.dock-tab-btn:active {
+    transform: scale(0.92);
 }
 
 body.light-theme {
