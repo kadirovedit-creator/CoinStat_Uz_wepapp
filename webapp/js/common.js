@@ -791,8 +791,58 @@ function initDockNavigation() {
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDockNavigation);
+    document.addEventListener('DOMContentLoaded', () => {
+        initDockNavigation();
+        initSplashScreen();
+    });
 } else {
     initDockNavigation();
+    initSplashScreen();
+}
+
+/* =========================================
+   App Launch Splash Loading Screen
+   ========================================= */
+function initSplashScreen() {
+    let splash = document.getElementById('appSplashScreen');
+    if (!splash) {
+        splash = document.createElement('div');
+        splash.className = 'app-splash-screen';
+        splash.id = 'appSplashScreen';
+        splash.innerHTML = `
+            <div class="splash-icon-box">
+                <img src="images/duck_anim.webp" alt="CoinStat">
+            </div>
+            <div class="splash-brand-title">COINSTAT UZ</div>
+            <div class="splash-dots-row">
+                <div class="splash-dot"></div>
+                <div class="splash-dot"></div>
+                <div class="splash-dot"></div>
+            </div>
+            <div class="splash-loading-text">Yuklanmoqda...</div>
+        `;
+        document.body.prepend(splash);
+    }
+
+    const startTime = Date.now();
+    const minDisplayTime = 750; // Smooth 750ms branding screen
+
+    function dismissSplash() {
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, minDisplayTime - elapsed);
+        setTimeout(() => {
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                splash.remove();
+            }, 500);
+        }, remaining);
+    }
+
+    if (document.readyState === 'complete') {
+        dismissSplash();
+    } else {
+        window.addEventListener('load', dismissSplash);
+        setTimeout(dismissSplash, 1500);
+    }
 }
 
