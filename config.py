@@ -90,7 +90,7 @@ PRODUCTS = {
         "min_amount": STARS_MIN_AMOUNT,
         "max_amount": STARS_MAX_AMOUNT,
         "packages": [
-            {"amount": 50, "price": 10000},
+            {"amount": 50, "price": 9900},
             {"amount": 75, "price": 15000},
             {"amount": 100, "price": 20000},
             {"amount": 250, "price": 50000},
@@ -105,7 +105,7 @@ PRODUCTS = {
         "packages": [
             {"duration": 3, "price": 160000, "name": "3 oy"},
             {"duration": 6, "price": 225000, "name": "6 oy"},
-            {"duration": 12, "price": 380000, "name": "12 oy"},
+            {"duration": 12, "price": 390000, "name": "12 oy"},
         ]
     },
     "phone": {

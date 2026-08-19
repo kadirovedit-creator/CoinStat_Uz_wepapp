@@ -92,8 +92,8 @@ async def process_quick_topup(callback: CallbackQuery, state: FSMContext):
         amount=amount,
         price=amount,
     )
-    card_number = os.getenv("CARD_NUMBER", "8801 7082 5750 1796")
-    card_owner = os.getenv("CARD_OWNER", "A A")
+    card_number = os.getenv("CARD_NUMBER", "8600 1204 3121 5410")
+    card_owner = os.getenv("CARD_OWNER", "T M")
     expires_in = 300
 
     now = tashkent_now()
@@ -150,8 +150,8 @@ async def process_topup_amount(message: Message, state: FSMContext):
         if result.get("success"):
             data = result["data"]
             order_id = data["order_id"]
-            card_number = data.get("card_number") or os.getenv("CARD_NUMBER", "8801 7082 5750 1796")
-            card_owner = data.get("card_owner") or os.getenv("CARD_OWNER", "A A")
+            card_number = data.get("card_number") or os.getenv("CARD_NUMBER", "8600 1204 3121 5410")
+            card_owner = data.get("card_owner") or os.getenv("CARD_OWNER", "T M")
             expires_in = data.get("expires_in", 300)
         else:
             # Fallback to local order creation
@@ -164,8 +164,8 @@ async def process_topup_amount(message: Message, state: FSMContext):
                 amount=int(amount),
                 price=int(amount),
             )
-            card_number = os.getenv("CARD_NUMBER", "8801 7082 5750 1796")
-            card_owner = os.getenv("CARD_OWNER", "A A")
+            card_number = os.getenv("CARD_NUMBER", "8600 1204 3121 5410")
+            card_owner = os.getenv("CARD_OWNER", "T M")
             expires_in = 300
 
         now = tashkent_now()

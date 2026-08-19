@@ -96,7 +96,7 @@ def stars_keyboard() -> InlineKeyboardMarkup:
     """Stars purchase packages"""
     builder = InlineKeyboardBuilder()
     for amount, price in [
-        (50, 10000), (75, 15000), (100, 20000),
+        (50, 9900), (75, 15000), (100, 20000),
         (250, 50000), (500, 100000),
     ]:
         builder.row(InlineKeyboardButton(
@@ -111,7 +111,7 @@ def premium_keyboard() -> InlineKeyboardMarkup:
     """Premium subscription packages"""
     builder = InlineKeyboardBuilder()
     for duration, price, name in [
-        (3, 160000, "3 oy"), (6, 225000, "6 oy"), (12, 380000, "12 oy"),
+        (3, 160000, "3 oy"), (6, 225000, "6 oy"), (12, 390000, "12 oy"),
     ]:
         builder.row(InlineKeyboardButton(
             text=f"💎 Premium {name} — {price:,} so'm",

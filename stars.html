@@ -356,9 +356,9 @@
                     <span>50</span>
                     <img src="images/star.webp" alt="Stars" class="star-badge-icon">
                 </div>
-                <div class="star-price-row">9 500 UZS</div>
+                <div class="star-price-row">9 900 UZS</div>
             </div>
-            <button class="star-buy-button" onclick="buyStarTier(50, 9500, this)">Sotib olish</button>
+            <button class="star-buy-button" onclick="buyStarTier(50, 9900, this)">Sotib olish</button>
         </div>
 
         <!-- 100 Stars -->
@@ -369,9 +369,9 @@
                     <span>100</span>
                     <img src="images/star.webp" alt="Stars" class="star-badge-icon">
                 </div>
-                <div class="star-price-row">19 000 UZS</div>
+                <div class="star-price-row">19 800 UZS</div>
             </div>
-            <button class="star-buy-button" onclick="buyStarTier(100, 19000, this)">Sotib olish</button>
+            <button class="star-buy-button" onclick="buyStarTier(100, 19800, this)">Sotib olish</button>
         </div>
 
         <!-- 500 Stars -->
@@ -382,9 +382,9 @@
                     <span>500</span>
                     <img src="images/star.webp" alt="Stars" class="star-badge-icon">
                 </div>
-                <div class="star-price-row">95 000 UZS</div>
+                <div class="star-price-row">99 000 UZS</div>
             </div>
-            <button class="star-buy-button" onclick="buyStarTier(500, 95000, this)">Sotib olish</button>
+            <button class="star-buy-button" onclick="buyStarTier(500, 99000, this)">Sotib olish</button>
         </div>
 
         <!-- 1000 Stars -->
@@ -395,9 +395,9 @@
                     <span>1 000</span>
                     <img src="images/star.webp" alt="Stars" class="star-badge-icon">
                 </div>
-                <div class="star-price-row">190 000 UZS</div>
+                <div class="star-price-row">198 000 UZS</div>
             </div>
-            <button class="star-buy-button" onclick="buyStarTier(1000, 190000, this)">Sotib olish</button>
+            <button class="star-buy-button" onclick="buyStarTier(1000, 198000, this)">Sotib olish</button>
         </div>
     </div>
 
@@ -409,7 +409,7 @@
                 <div class="custom-stars-sub">Ixtiyoriy miqdorni kiriting (min 50)</div>
             </div>
             <div class="custom-star-calc-badge">
-                <span id="customPricePreview">9 500</span> UZS
+                <span id="customPricePreview">9 900</span> UZS
             </div>
         </div>
 
@@ -549,7 +549,7 @@
             const preview = document.getElementById('customPricePreview');
             let qty = parseInt(input?.value || '0', 10);
             if (isNaN(qty) || qty < 1) qty = 0;
-            const price = qty * 190;
+            const price = qty * 198;
             if (preview) preview.textContent = price.toLocaleString('uz-UZ');
             return { qty, price };
         }

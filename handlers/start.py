@@ -68,10 +68,12 @@ async def is_user_subscribed(bot: Bot, user_id: int) -> bool:
         member = await bot.get_chat_member(chat_id=REQUIRED_CHANNEL, user_id=user_id)
         if member.status in ["creator", "administrator", "member"]:
             return True
+        if member.status == "restricted" and getattr(member, "is_member", False):
+            return True
         return False
     except Exception as e:
         logger.warning("Could not check subscription for user %s: %s", user_id, e)
-        return True
+        return False
 
 
 def get_subscription_keyboard(lang: str = "uz") -> InlineKeyboardMarkup:
@@ -127,6 +129,17 @@ async def cmd_start(message: Message):
         if not user:
             user = await db.get_user(user_id)
         lang = user.get("language", "uz") if user else "uz"
+
+        # Check mandatory subscription
+        subscribed = await is_user_subscribed(message.bot, user_id)
+        if not subscribed:
+            await message.answer(
+                get_sub_required_text(lang),
+                reply_markup=get_subscription_keyboard(lang),
+                parse_mode="HTML"
+            )
+            return
+
         welcome_text = get_welcome_text(user, username, first_name)
         user_bal = user.get("balance", 0) if user else 0
 
@@ -165,6 +178,11 @@ async def check_subscription_callback(callback: CallbackQuery):
 
     success_msg = "✅ Rahmat! Xush kelibsiz!" if lang != "ru" else "✅ Спасибо! Добро пожаловать!"
     await callback.answer(success_msg, show_alert=True)
+
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
 
     welcome_text = get_welcome_text(user, callback.from_user.username, callback.from_user.first_name)
     await callback.message.answer(

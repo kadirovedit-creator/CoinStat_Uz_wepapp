@@ -125,9 +125,9 @@ module.exports = async (req, res) => {
   if (productType.toLowerCase().includes('premium')) {
     price = parseInt(body.amount, 10);
     if (!price || isNaN(price)) {
-      if (months === 12) price = 380000;
-      else if (months === 6) price = 210000;
-      else price = 135000;
+      if (months === 12) price = 390000;
+      else if (months === 6) price = 225000;
+      else price = 160000;
     }
     quantity = months || 3;
   } else if (productType.toLowerCase().includes('nomer')) {
@@ -138,9 +138,7 @@ module.exports = async (req, res) => {
     price = parseInt(body.amount, 10);
     
     if (!price || isNaN(price)) {
-      if (quantity >= 1000) price = quantity * 190;
-      else if (quantity >= 100) price = quantity * 190;
-      else price = quantity * 200;
+      price = quantity * 198;
     }
   }
 
