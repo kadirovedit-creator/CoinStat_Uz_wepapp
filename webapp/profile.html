@@ -406,15 +406,16 @@
                     const cnt = document.getElementById('ordersCount');
                     const spent = document.getElementById('totalSpent');
 
-                    // Filter only real purchase orders (exclude topup and deposits)
-                    const purchaseOrders = (data.orders || []).filter(o => 
-                        o.product_type !== 'topup' && 
-                        o.product_type !== 'deposit' && 
-                        o.product_type !== 'balance' &&
-                        o.status !== 'cancelled' &&
-                        o.status !== 'failed' &&
-                        o.status !== 'rejected'
-                    );
+                    // Filter only real purchase orders (exclude any topup and deposits)
+                    const purchaseOrders = (data.orders || []).filter(o => {
+                        const pt = String(o.product_type || o.type || '').toLowerCase();
+                        return !pt.startsWith('topup') && 
+                               pt !== 'deposit' && 
+                               pt !== 'balance' &&
+                               o.status !== 'cancelled' &&
+                               o.status !== 'failed' &&
+                               o.status !== 'rejected';
+                    });
 
                     const ordersCount = (typeof data.orders_count === 'number') ? data.orders_count : purchaseOrders.length;
                     if (cnt) cnt.textContent = String(ordersCount);

@@ -113,14 +113,15 @@ module.exports = async (req, res) => {
     }
 
     // 3. Calculate total spent and orders count (ONLY actual purchases, excluding topup/deposit)
-    const validOrders = orders.filter(o => 
-      o.product_type !== 'topup' && 
-      o.product_type !== 'deposit' && 
-      o.product_type !== 'balance' && 
-      o.status !== 'cancelled' && 
-      o.status !== 'failed' && 
-      o.status !== 'rejected'
-    );
+    const validOrders = orders.filter(o => {
+      const pt = String(o.product_type || '').toLowerCase();
+      return !pt.startsWith('topup') && 
+             pt !== 'deposit' && 
+             pt !== 'balance' && 
+             o.status !== 'cancelled' && 
+             o.status !== 'failed' && 
+             o.status !== 'rejected';
+    });
     
     let totalSpent = 0;
     validOrders.forEach(o => {

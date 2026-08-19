@@ -8,14 +8,10 @@ async function viewUsers() {
   });
 
   try {
-    const allUsers = await pool.query('SELECT telegram_id, username, balance FROM users WHERE telegram_id = 8202423244');
-    console.log('User:');
-    console.table(allUsers.rows);
-    const orders = await pool.query('SELECT id, telegram_id, product_type, amount, status FROM orders WHERE telegram_id = 8202423244');
-    console.log('Orders:');
-    console.table(orders.rows);
+    const upd = await pool.query("UPDATE orders SET product_type = 'topup' WHERE product_type LIKE 'topup_%'");
+    console.log('Normalized rows:', upd.rowCount);
   } catch (err) {
-    console.error('Error viewing users:', err);
+    console.error('Error updating DB:', err);
   } finally {
     await pool.end();
   }

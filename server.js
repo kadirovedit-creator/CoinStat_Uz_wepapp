@@ -137,14 +137,15 @@ app.all(['/api/user/transactions', '/api/transactions'], async (req, res) => {
       console.warn('Balance history query error:', e.message);
     }
 
-    const validOrders = orders.filter(o => 
-      o.product_type !== 'topup' && 
-      o.product_type !== 'deposit' && 
-      o.product_type !== 'balance' && 
-      o.status !== 'cancelled' && 
-      o.status !== 'failed' && 
-      o.status !== 'rejected'
-    );
+    const validOrders = orders.filter(o => {
+      const pt = String(o.product_type || '').toLowerCase();
+      return !pt.startsWith('topup') && 
+             pt !== 'deposit' && 
+             pt !== 'balance' && 
+             o.status !== 'cancelled' && 
+             o.status !== 'failed' && 
+             o.status !== 'rejected';
+    });
     let totalSpent = 0;
     validOrders.forEach(o => {
       if (o.status === 'completed' || o.status === 'paid') {
@@ -189,7 +190,8 @@ app.all(['/api/rating', '/api/leaderboard'], async (req, res) => {
           FROM orders o 
           WHERE o.telegram_id = u.telegram_id 
             AND o.status IN ('completed', 'paid') 
-            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+            AND o.product_type NOT LIKE 'topup%'
+            AND o.product_type NOT IN ('deposit', 'balance')
             ${timeFilter}
         ), 0)::BIGINT as total
       FROM users u
@@ -197,7 +199,8 @@ app.all(['/api/rating', '/api/leaderboard'], async (req, res) => {
         SELECT 1 FROM orders o 
         WHERE o.telegram_id = u.telegram_id 
           AND o.status IN ('completed', 'paid') 
-          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+          AND o.product_type NOT LIKE 'topup%'
+          AND o.product_type NOT IN ('deposit', 'balance')
           ${timeFilter}
       )
       ORDER BY total DESC, u.id ASC

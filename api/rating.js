@@ -53,7 +53,8 @@ module.exports = async (req, res) => {
           FROM orders o 
           WHERE o.telegram_id = u.telegram_id 
             AND o.status IN ('completed', 'paid') 
-            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+            AND o.product_type NOT LIKE 'topup%'
+            AND o.product_type NOT IN ('deposit', 'balance')
             ${timeFilter}
         ), 0)::BIGINT as total
       FROM users u
@@ -61,7 +62,8 @@ module.exports = async (req, res) => {
         SELECT 1 FROM orders o 
         WHERE o.telegram_id = u.telegram_id 
           AND o.status IN ('completed', 'paid') 
-          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+          AND o.product_type NOT LIKE 'topup%'
+          AND o.product_type NOT IN ('deposit', 'balance')
           ${timeFilter}
       )
       ORDER BY total DESC, u.id ASC

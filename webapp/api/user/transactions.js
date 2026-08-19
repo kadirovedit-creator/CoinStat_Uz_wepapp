@@ -107,14 +107,15 @@ module.exports = async (req, res) => {
       console.warn('Balance history table error:', e.message);
     }
 
-    const validOrders = orders.filter(o => 
-      o.product_type !== 'topup' && 
-      o.product_type !== 'deposit' && 
-      o.product_type !== 'balance' && 
-      o.status !== 'cancelled' && 
-      o.status !== 'failed' && 
-      o.status !== 'rejected'
-    );
+    const validOrders = orders.filter(o => {
+      const pt = String(o.product_type || '').toLowerCase();
+      return !pt.startsWith('topup') && 
+             pt !== 'deposit' && 
+             pt !== 'balance' && 
+             o.status !== 'cancelled' && 
+             o.status !== 'failed' && 
+             o.status !== 'rejected';
+    });
     
     let totalSpent = 0;
     validOrders.forEach(o => {

@@ -83,8 +83,8 @@ module.exports = async (req, res) => {
     const db = getPool();
     await db.query(
       `INSERT INTO orders (telegram_id, product_type, amount, status, external_id, created_at)
-       VALUES ($1, $2, $3, 'pending', $4, NOW())`,
-      [userId, 'topup_' + paymentMethod, amount, orderId]
+       VALUES ($1, 'topup', $2, 'pending', $3, NOW())`,
+      [userId, amount, orderId]
     ).catch(e => console.error('Error recording order:', e));
 
     const adminText = 

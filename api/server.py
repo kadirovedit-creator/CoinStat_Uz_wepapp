@@ -984,7 +984,7 @@ async def api_user_transactions(request: web.Request) -> web.Response:
   orders = [serialize(r) for r in orders_rows]
   balance_history = [serialize(r) for r in balance_rows]
 
-  actual_orders = [o for o in orders if o.get("product_type") not in ("topup", "balance") and o.get("status") not in ("cancelled", "failed")]
+  actual_orders = [o for o in orders if not str(o.get("product_type") or "").lower().startswith("topup") and o.get("product_type") not in ("balance", "deposit") and o.get("status") not in ("cancelled", "failed", "rejected")]
   total_spent = sum(int(o.get("amount") or 0) for o in actual_orders if o.get("status") in ("completed", "paid"))
 
   return web.json_response({
@@ -1088,7 +1088,8 @@ async def api_rating(request: web.Request) -> web.Response:
           FROM orders o 
           WHERE o.telegram_id = u.telegram_id 
             AND o.status IN ('completed', 'paid') 
-            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+            AND o.product_type NOT LIKE 'topup%'
+            AND o.product_type NOT IN ('deposit', 'balance')
             {time_cond}
         ), 0) as total
       FROM users u
@@ -1096,7 +1097,8 @@ async def api_rating(request: web.Request) -> web.Response:
         SELECT 1 FROM orders o 
         WHERE o.telegram_id = u.telegram_id 
           AND o.status IN ('completed', 'paid') 
-          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+          AND o.product_type NOT LIKE 'topup%'
+          AND o.product_type NOT IN ('deposit', 'balance')
           {time_cond}
       )
       ORDER BY total DESC, u.id ASC
@@ -1122,7 +1124,8 @@ async def api_rating(request: web.Request) -> web.Response:
           FROM orders o 
           WHERE o.telegram_id = u.telegram_id 
             AND o.status IN ('completed', 'paid') 
-            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+            AND o.product_type NOT LIKE 'topup%'
+            AND o.product_type NOT IN ('deposit', 'balance')
             {time_cond}
         ), 0) as total
       FROM users u
@@ -1130,7 +1133,8 @@ async def api_rating(request: web.Request) -> web.Response:
         SELECT 1 FROM orders o 
         WHERE o.telegram_id = u.telegram_id 
           AND o.status IN ('completed', 'paid') 
-          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+          AND o.product_type NOT LIKE 'topup%'
+          AND o.product_type NOT IN ('deposit', 'balance')
           {time_cond}
       )
       ORDER BY total DESC, u.id ASC
