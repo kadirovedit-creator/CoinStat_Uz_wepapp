@@ -86,10 +86,15 @@ function setupUserProfileHeader() {
 }
 
 function updateStarsEquivalent(bal) {
-    const starsEl = document.getElementById('starsEquivalent');
+    const starsEl = document.getElementById('starsEquivalent') || document.getElementById('approxStars');
     if (starsEl) {
         const starsEquiv = Math.floor((bal || 0) / 200);
         starsEl.textContent = starsEquiv.toLocaleString('uz-UZ');
+    }
+    const approxEl = document.getElementById('approxStars');
+    if (approxEl) {
+        const starsEquiv = Math.floor((bal || 0) / 200);
+        approxEl.textContent = starsEquiv.toLocaleString('uz-UZ');
     }
 }
 
