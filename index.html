@@ -95,57 +95,218 @@
             text-transform: uppercase;
         }
 
-        /* Hero Balance Card */
-        .hero-balance-container {
-            background: #121316;
-            border: 1px solid #222328;
-            border-radius: 26px;
-            padding: 22px 20px;
+        /* Luxury Black VIP Bank Card */
+        .luxury-bank-card {
+            background: linear-gradient(135deg, #181920 0%, #0d0e12 50%, #14151b 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 22px 20px 18px 20px;
             margin-bottom: 16px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.15);
         }
 
-        .hero-balance-amount {
-            font-size: 32px;
-            font-weight: 800;
-            color: #ffffff;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-        }
-
-        .hero-chart-graphic {
-            width: 100%;
-            height: 64px;
-            margin: 10px 0 18px 0;
-            position: relative;
-        }
-
-        .hero-chart-graphic svg {
+        /* Abstract Luxury Background Mesh & Glow */
+        .card-bg-mesh {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: visible;
+            pointer-events: none;
+            z-index: 1;
         }
 
-        .hero-topup-button {
+        .card-bg-mesh svg {
             width: 100%;
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            border-radius: 16px;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content-layer {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Card Top Bar: Chip + NFC + Brand */
+        .card-top-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+        }
+
+        .card-chip-nfc-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .emv-chip {
+            width: 36px;
+            height: 27px;
+            background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #b45309 100%);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(245, 158, 11, 0.6);
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .emv-chip::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .emv-chip::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 1px;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .chip-inner-core {
+            position: absolute;
+            top: 6px;
+            bottom: 6px;
+            left: 8px;
+            right: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+        }
+
+        .nfc-wave-icon {
+            width: 20px;
+            height: 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .card-brand-badge {
+            display: flex;
+            align-items: center;
             gap: 6px;
         }
 
-        .hero-topup-button:active {
-            transform: scale(0.98);
+        .card-brand-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+        }
+
+        .card-vip-pill {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #f59e0b;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* Card Balance Center */
+        .card-balance-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .card-balance-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #71717a;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .card-balance-amount {
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .card-currency-symbol {
+            font-size: 16px;
+            font-weight: 800;
+            color: #f59e0b;
+        }
+
+        .card-number-mask {
+            font-family: 'Space Grotesk', monospace, sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #52525b;
+            letter-spacing: 2.5px;
+            margin-top: 2px;
+        }
+
+        /* Card Bottom Row */
+        .card-bottom-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding-top: 4px;
+        }
+
+        .card-holder-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .card-holder-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #71717a;
+            letter-spacing: 1px;
+        }
+
+        .card-holder-name {
+            font-size: 12px;
+            font-weight: 800;
+            color: #e4e4e7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-topup-btn {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 12px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .card-topup-btn:active {
+            transform: scale(0.96);
             background: #e4e4e7;
         }
 
@@ -302,26 +463,81 @@
         <button class="lang-badge-pill" onclick="toggleLanguage()" id="langBtn">uz</button>
     </div>
 
-    <!-- Hero Balance Card -->
-    <div class="hero-balance-container">
-        <div class="hero-balance-amount">
-            <span id="balance">0</span> UZS
-        </div>
-
-        <!-- Ascending Growth Chart SVG -->
-        <div class="hero-chart-graphic">
-            <svg viewBox="0 0 300 60" fill="none">
-                <path d="M5 45 L 80 40 L 140 48 L 190 28 L 290 8" stroke="#3f3f46" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                <circle cx="80" cy="40" r="4" fill="#121316" stroke="#ffffff" stroke-width="2.5" />
-                <circle cx="140" cy="48" r="4" fill="#121316" stroke="#ffffff" stroke-width="2.5" />
-                <circle cx="190" cy="28" r="4" fill="#121316" stroke="#ffffff" stroke-width="2.5" />
-                <polyline points="275 8, 290 8, 290 23" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Luxury Black VIP Bank Card -->
+    <div class="luxury-bank-card">
+        <!-- Abstract Luxury Background Contour Curves & Radial Ambient Glow -->
+        <div class="card-bg-mesh">
+            <svg viewBox="0 0 360 190" fill="none" preserveAspectRatio="none">
+                <!-- Glowing Ambient Circles -->
+                <circle cx="330" cy="30" r="110" stroke="url(#cardMeshGrad1)" stroke-width="1.2" opacity="0.35" />
+                <circle cx="330" cy="30" r="150" stroke="url(#cardMeshGrad1)" stroke-width="1" opacity="0.2" stroke-dasharray="6 6" />
+                <circle cx="330" cy="30" r="190" stroke="url(#cardMeshGrad1)" stroke-width="0.8" opacity="0.1" />
+                
+                <!-- Modern Flowing Luxury Contour Lines -->
+                <path d="M-20 160 C 90 90, 180 200, 380 110" stroke="url(#cardMeshGrad2)" stroke-width="1.5" opacity="0.25" />
+                <path d="M-30 180 C 110 120, 210 220, 390 130" stroke="url(#cardMeshGrad2)" stroke-width="1" opacity="0.15" />
+                
+                <defs>
+                    <linearGradient id="cardMeshGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#f59e0b" />
+                        <stop offset="100%" stop-color="#3b82f6" />
+                    </linearGradient>
+                    <linearGradient id="cardMeshGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" />
+                        <stop offset="50%" stop-color="#f59e0b" />
+                        <stop offset="100%" stop-color="#10b981" />
+                    </linearGradient>
+                </defs>
             </svg>
         </div>
 
-        <button type="button" class="hero-topup-button" onclick="window.location.href='topup.html'">
-            <span>+ To'ldirish</span>
-        </button>
+        <div class="card-content-layer">
+            <!-- Card Top Bar: Chip + NFC + Brand -->
+            <div class="card-top-bar">
+                <div class="card-chip-nfc-group">
+                    <!-- Gold EMV Chip -->
+                    <div class="emv-chip">
+                        <div class="chip-inner-core"></div>
+                    </div>
+                    <!-- Contactless Waves -->
+                    <svg class="nfc-wave-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <path d="M8.5 16.5a5 5 0 0 1 0-9" />
+                        <path d="M12 19a8.5 8.5 0 0 0 0-14" />
+                        <path d="M15.5 21.5a12 12 0 0 0 0-19" />
+                    </svg>
+                </div>
+                <div class="card-brand-badge">
+                    <span class="card-brand-title">COINSTAT</span>
+                    <span class="card-vip-pill">BLACK</span>
+                </div>
+            </div>
+
+            <!-- Card Middle: Balance Details -->
+            <div class="card-balance-section">
+                <div class="card-balance-label">ASOSIY BALANS</div>
+                <div class="card-balance-amount">
+                    <span id="balance">0</span> <span class="card-currency-symbol">UZS</span>
+                </div>
+                <div class="card-number-mask">
+                    <span>••••</span> <span>••••</span> <span>••••</span> <span id="cardMaskUid">0000</span>
+                </div>
+            </div>
+
+            <!-- Card Bottom Row: Cardholder & Topup Action -->
+            <div class="card-bottom-row">
+                <div class="card-holder-group">
+                    <div class="card-holder-label">KARTA EGASI</div>
+                    <div class="card-holder-name" id="cardHolderName">VIP FOYDALANUVCHI</div>
+                </div>
+                <button type="button" class="card-topup-btn" onclick="window.location.href='topup.html'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>To'ldirish</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- 3-Column Stats Grid -->
@@ -405,6 +621,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadUserBalance();
             fetchTransactions();
+
+            const userId = String(getUserId() || '');
+            if (userId) {
+                const maskEl = document.getElementById('cardMaskUid');
+                if (maskEl) maskEl.textContent = userId.slice(-4) || '0000';
+            }
+
+            const holderEl = document.getElementById('cardHolderName');
+            if (holderEl && tg.initDataUnsafe?.user) {
+                const u = tg.initDataUnsafe.user;
+                holderEl.textContent = u.username ? ('@' + u.username) : (((u.first_name || '') + ' ' + (u.last_name || '')).trim() || 'VIP FOYDALANUVCHI');
+            }
         });
 
         async function fetchTransactions() {
