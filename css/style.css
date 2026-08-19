@@ -31,20 +31,37 @@
    ========================================= */
 .bottom-dock-nav {
     position: fixed;
-    bottom: 18px;
-    left: 18px;
-    right: 18px;
-    background: #141724;
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(20, 23, 36, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
     padding: 6px 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     z-index: 999;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 4px 14px rgba(0, 0, 0, 0.4);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Moving Blue Pill Glider */
+.dock-active-glider {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 25%;
+    background: linear-gradient(135deg, #3867ff 0%, #2554f6 100%);
+    border-radius: 999px;
+    box-shadow: 0 4px 20px rgba(37, 84, 246, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    transition: transform 0.35s cubic-bezier(0.34, 1.45, 0.64, 1), width 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .dock-tab-btn {
@@ -53,39 +70,42 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    padding: 8px 16px;
+    padding: 8px 10px;
     border-radius: 999px;
     color: #838a9f;
     cursor: pointer;
     text-decoration: none;
     user-select: none;
-    transition: all 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
     position: relative;
+    z-index: 2;
     flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    transition: color 0.25s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dock-tab-btn svg {
     width: 22px;
     height: 22px;
-    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 0.2s ease;
 }
 
 .dock-tab-btn span {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.2px;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, font-weight 0.2s ease;
 }
 
-/* Active Capsule Pill with Vibrant Blue Glow */
+/* Active Tab Text and Icon Styling */
 .dock-tab-btn.active {
-    background: #2b59ff;
     color: #ffffff;
-    box-shadow: 0 4px 18px rgba(43, 89, 255, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 .dock-tab-btn.active svg {
-    transform: scale(1.08);
+    transform: scale(1.1);
+    stroke: #ffffff;
 }
 
 .dock-tab-btn.active span {
@@ -93,8 +113,8 @@
     color: #ffffff;
 }
 
-.dock-tab-btn:active {
-    transform: scale(0.92);
+.dock-tab-btn:active svg {
+    transform: scale(0.9);
 }
 
 body.light-theme {

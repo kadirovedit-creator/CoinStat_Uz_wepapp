@@ -693,3 +693,106 @@ function openOrders() {
     openTransactionsModal();
 }
 
+/* =========================================
+   Bottom Dock Sliding Capsule Navigation
+   ========================================= */
+function initDockNavigation() {
+    const dock = document.querySelector('.bottom-dock-nav');
+    if (!dock) return;
+
+    let glider = dock.querySelector('.dock-active-glider');
+    if (!glider) {
+        glider = document.createElement('div');
+        glider.className = 'dock-active-glider';
+        dock.prepend(glider);
+    }
+
+    const tabs = Array.from(dock.querySelectorAll('.dock-tab-btn'));
+    if (!tabs.length) return;
+
+    let activeIdx = tabs.findIndex(t => t.classList.contains('active'));
+    if (activeIdx === -1) activeIdx = 0;
+
+    const setGlider = (idx, animated = true) => {
+        const targetTab = tabs[idx];
+        if (!targetTab || !glider) return;
+        
+        const dockRect = dock.getBoundingClientRect();
+        const tabRect = targetTab.getBoundingClientRect();
+        
+        const leftOffset = tabRect.left - dockRect.left;
+        const width = tabRect.width;
+
+        if (!animated) {
+            glider.style.transition = 'none';
+        } else {
+            glider.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.45, 0.64, 1), width 0.3s ease';
+        }
+
+        glider.style.width = width + 'px';
+        glider.style.transform = `translateX(${leftOffset}px)`;
+    };
+
+    // Check if we came from another tab for seamless sliding entrance
+    const prevIdxStr = sessionStorage.getItem('starpay_last_tab_idx');
+    if (prevIdxStr !== null && !isNaN(parseInt(prevIdxStr, 10)) && parseInt(prevIdxStr, 10) !== activeIdx) {
+        const prevIdx = parseInt(prevIdxStr, 10);
+        if (prevIdx >= 0 && prevIdx < tabs.length) {
+            setGlider(prevIdx, false);
+            setTimeout(() => {
+                setGlider(activeIdx, true);
+            }, 30);
+        } else {
+            setGlider(activeIdx, false);
+        }
+    } else {
+        setGlider(activeIdx, false);
+        setTimeout(() => setGlider(activeIdx, true), 50);
+    }
+
+    sessionStorage.setItem('starpay_last_tab_idx', String(activeIdx));
+
+    // Handle tab clicks with fluid sliding animation & haptic feedback
+    tabs.forEach((tab, idx) => {
+        const onclickAttr = tab.getAttribute('onclick') || '';
+        const match = onclickAttr.match(/window\.location\.href\s*=\s*['"]([^'"]+)['"]/);
+        const targetUrl = match ? match[1] : tab.getAttribute('href');
+
+        tab.removeAttribute('onclick');
+
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Haptic Feedback
+            try {
+                if (window.Telegram?.WebApp?.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }
+            } catch(err) {}
+
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            setGlider(idx, true);
+            sessionStorage.setItem('starpay_last_tab_idx', String(idx));
+
+            if (targetUrl) {
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 130);
+            }
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        const curActive = tabs.findIndex(t => t.classList.contains('active'));
+        if (curActive !== -1) setGlider(curActive, false);
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDockNavigation);
+} else {
+    initDockNavigation();
+}
+
