@@ -42,32 +42,29 @@ module.exports = async (req, res) => {
   try {
     const db = getPool();
     
-    // Rank users by total activity: completed orders + balance
+    // Rank users ONLY by actual purchases / spending (excluding topup/deposit)
     const query = `
       SELECT 
         u.telegram_id, 
         u.username, 
         u.full_name,
-        (
-          COALESCE((
-            SELECT SUM(o.amount) 
-            FROM orders o 
-            WHERE o.telegram_id = u.telegram_id 
-              AND o.status IN ('completed', 'paid') 
-              ${timeFilter}
-          ), 0) + COALESCE(u.balance, 0)
-        )::BIGINT as total
-      FROM users u
-      WHERE (
-        u.balance > 0 
-        OR EXISTS (
-          SELECT 1 FROM orders o 
+        COALESCE((
+          SELECT SUM(o.amount) 
+          FROM orders o 
           WHERE o.telegram_id = u.telegram_id 
             AND o.status IN ('completed', 'paid') 
+            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
             ${timeFilter}
-        )
+        ), 0)::BIGINT as total
+      FROM users u
+      WHERE EXISTS (
+        SELECT 1 FROM orders o 
+        WHERE o.telegram_id = u.telegram_id 
+          AND o.status IN ('completed', 'paid') 
+          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+          ${timeFilter}
       )
-      ORDER BY total DESC, u.balance DESC
+      ORDER BY total DESC, u.id ASC
       LIMIT 50
     `;
 
@@ -78,21 +75,6 @@ module.exports = async (req, res) => {
       username: r.username || (r.full_name ? r.full_name : `User#${r.telegram_id}`),
       total: Number(r.total || 0),
     }));
-
-    // Fallback if completely empty
-    if (rating.length === 0) {
-      const topUsers = await db.query(`
-        SELECT telegram_id, username, full_name, balance as total
-        FROM users
-        ORDER BY balance DESC, referrals DESC
-        LIMIT 10
-      `);
-      rating = topUsers.rows.map(u => ({
-        telegram_id: Number(u.telegram_id),
-        username: u.username || u.full_name || `User#${u.telegram_id}`,
-        total: Number(u.total || 0),
-      }));
-    }
 
     return res.status(200).json({
       ok: true,

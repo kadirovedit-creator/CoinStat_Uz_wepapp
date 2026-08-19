@@ -137,7 +137,14 @@ app.all(['/api/user/transactions', '/api/transactions'], async (req, res) => {
       console.warn('Balance history query error:', e.message);
     }
 
-    const validOrders = orders.filter(o => o.status !== 'cancelled' && o.status !== 'failed' && o.status !== 'rejected');
+    const validOrders = orders.filter(o => 
+      o.product_type !== 'topup' && 
+      o.product_type !== 'deposit' && 
+      o.product_type !== 'balance' && 
+      o.status !== 'cancelled' && 
+      o.status !== 'failed' && 
+      o.status !== 'rejected'
+    );
     let totalSpent = 0;
     validOrders.forEach(o => {
       if (o.status === 'completed' || o.status === 'paid') {
@@ -158,7 +165,7 @@ app.all(['/api/user/transactions', '/api/transactions'], async (req, res) => {
   }
 });
 
-// 3. Rating API
+// 3. Rating API (Ranks ONLY by actual purchases / spending)
 app.all(['/api/rating', '/api/leaderboard'], async (req, res) => {
   const period = req.query.period || req.body?.period || 'all';
 
@@ -177,26 +184,23 @@ app.all(['/api/rating', '/api/leaderboard'], async (req, res) => {
         u.telegram_id, 
         u.username, 
         u.full_name,
-        (
-          COALESCE((
-            SELECT SUM(o.amount) 
-            FROM orders o 
-            WHERE o.telegram_id = u.telegram_id 
-              AND o.status IN ('completed', 'paid') 
-              ${timeFilter}
-          ), 0) + COALESCE(u.balance, 0)
-        )::BIGINT as total
-      FROM users u
-      WHERE (
-        u.balance > 0 
-        OR EXISTS (
-          SELECT 1 FROM orders o 
+        COALESCE((
+          SELECT SUM(o.amount) 
+          FROM orders o 
           WHERE o.telegram_id = u.telegram_id 
             AND o.status IN ('completed', 'paid') 
+            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
             ${timeFilter}
-        )
+        ), 0)::BIGINT as total
+      FROM users u
+      WHERE EXISTS (
+        SELECT 1 FROM orders o 
+        WHERE o.telegram_id = u.telegram_id 
+          AND o.status IN ('completed', 'paid') 
+          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+          ${timeFilter}
       )
-      ORDER BY total DESC, u.balance DESC
+      ORDER BY total DESC, u.id ASC
       LIMIT 50
     `;
 
@@ -206,20 +210,6 @@ app.all(['/api/rating', '/api/leaderboard'], async (req, res) => {
       username: r.username || (r.full_name ? r.full_name : `User#${r.telegram_id}`),
       total: Number(r.total || 0),
     }));
-
-    if (rating.length === 0) {
-      const topUsers = await pool.query(`
-        SELECT telegram_id, username, full_name, balance as total
-        FROM users
-        ORDER BY balance DESC, referrals DESC
-        LIMIT 10
-      `);
-      rating = topUsers.rows.map(u => ({
-        telegram_id: Number(u.telegram_id),
-        username: u.username || u.full_name || `User#${u.telegram_id}`,
-        total: Number(u.total || 0),
-      }));
-    }
 
     return res.json({ ok: true, period, rating });
   } catch (err) {

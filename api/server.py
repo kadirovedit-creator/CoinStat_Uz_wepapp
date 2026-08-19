@@ -1083,23 +1083,23 @@ async def api_rating(request: web.Request) -> web.Response:
         u.telegram_id, 
         u.username, 
         u.full_name,
-        (
-          COALESCE((
-            SELECT SUM(o.amount) 
-            FROM orders o 
-            WHERE o.telegram_id = u.telegram_id 
-              AND o.status IN ('completed', 'paid') 
-              {time_cond}
-          ), 0) + COALESCE(u.balance, 0)
-        ) as total
+        COALESCE((
+          SELECT SUM(o.amount) 
+          FROM orders o 
+          WHERE o.telegram_id = u.telegram_id 
+            AND o.status IN ('completed', 'paid') 
+            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+            {time_cond}
+        ), 0) as total
       FROM users u
-      WHERE u.balance > 0 OR EXISTS (
+      WHERE EXISTS (
         SELECT 1 FROM orders o 
         WHERE o.telegram_id = u.telegram_id 
           AND o.status IN ('completed', 'paid') 
+          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
           {time_cond}
       )
-      ORDER BY total DESC, u.balance DESC
+      ORDER BY total DESC, u.id ASC
       LIMIT 50
     """
   else:
@@ -1117,23 +1117,23 @@ async def api_rating(request: web.Request) -> web.Response:
         u.telegram_id, 
         u.username, 
         u.full_name,
-        (
-          COALESCE((
-            SELECT SUM(o.amount) 
-            FROM orders o 
-            WHERE o.telegram_id = u.telegram_id 
-              AND o.status IN ('completed', 'paid') 
-              {time_cond}
-          ), 0) + COALESCE(u.balance, 0)
-        ) as total
+        COALESCE((
+          SELECT SUM(o.amount) 
+          FROM orders o 
+          WHERE o.telegram_id = u.telegram_id 
+            AND o.status IN ('completed', 'paid') 
+            AND o.product_type NOT IN ('topup', 'deposit', 'balance')
+            {time_cond}
+        ), 0) as total
       FROM users u
-      WHERE u.balance > 0 OR EXISTS (
+      WHERE EXISTS (
         SELECT 1 FROM orders o 
         WHERE o.telegram_id = u.telegram_id 
           AND o.status IN ('completed', 'paid') 
+          AND o.product_type NOT IN ('topup', 'deposit', 'balance')
           {time_cond}
       )
-      ORDER BY total DESC, u.balance DESC
+      ORDER BY total DESC, u.id ASC
       LIMIT 50
     """
 

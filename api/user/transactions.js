@@ -112,8 +112,15 @@ module.exports = async (req, res) => {
       console.warn('Balance history table error:', e.message);
     }
 
-    // 3. Calculate total spent and orders count
-    const validOrders = orders.filter(o => o.status !== 'cancelled' && o.status !== 'failed' && o.status !== 'rejected');
+    // 3. Calculate total spent and orders count (ONLY actual purchases, excluding topup/deposit)
+    const validOrders = orders.filter(o => 
+      o.product_type !== 'topup' && 
+      o.product_type !== 'deposit' && 
+      o.product_type !== 'balance' && 
+      o.status !== 'cancelled' && 
+      o.status !== 'failed' && 
+      o.status !== 'rejected'
+    );
     
     let totalSpent = 0;
     validOrders.forEach(o => {
