@@ -8,9 +8,12 @@ async function viewUsers() {
   });
 
   try {
-    const allUsers = await pool.query('SELECT telegram_id, username, balance FROM users');
-    console.log('Current users in DB (All balances 0):');
+    const allUsers = await pool.query('SELECT telegram_id, username, balance FROM users WHERE telegram_id = 8202423244');
+    console.log('User:');
     console.table(allUsers.rows);
+    const orders = await pool.query('SELECT id, telegram_id, product_type, amount, status FROM orders WHERE telegram_id = 8202423244');
+    console.log('Orders:');
+    console.table(orders.rows);
   } catch (err) {
     console.error('Error viewing users:', err);
   } finally {

@@ -556,9 +556,26 @@
 
             container.innerHTML = html;
 
+            // Fallback for user's personal turnover if not in top 50
+            if (myTurnover === 0 && currentUserId) {
+                try {
+                    fetch((apiBase ? apiBase : '') + '/api/user/transactions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
+                        body: JSON.stringify({ telegram_id: currentUserId, initData: tg.initData || '' })
+                    }).then(r => r.json()).then(tData => {
+                        if (tData && tData.ok && typeof tData.total_spent === 'number') {
+                            myTurnover = tData.total_spent;
+                            if (myTurnoverEl) myTurnoverEl.textContent = Number(myTurnover).toLocaleString('uz-UZ') + ' UZS';
+                            if (myRankEl && !myRank) myRankEl.textContent = myTurnover > 0 ? '#50+' : '—';
+                        }
+                    }).catch(() => {});
+                } catch(e) {}
+            }
+
             const myRankEl = document.getElementById('myRankNum');
             const myTurnoverEl = document.getElementById('myTurnoverVal');
-            if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '#1';
+            if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '—';
             if (myTurnoverEl) myTurnoverEl.textContent = myTurnover ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
 
             if (tg.initDataUnsafe?.user?.photo_url) {

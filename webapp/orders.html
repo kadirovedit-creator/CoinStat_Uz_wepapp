@@ -344,9 +344,10 @@
         }
 
         function updateStats(orders) {
-            document.getElementById('statAll').textContent = orders.length;
-            document.getElementById('statDone').textContent = orders.filter(o => o.status === 'completed' || o.status === 'paid').length;
-            document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending').length;
+            const purchaseOrders = (orders || []).filter(o => o.product_type !== 'topup' && o.product_type !== 'deposit' && o.product_type !== 'balance');
+            document.getElementById('statAll').textContent = purchaseOrders.length;
+            document.getElementById('statDone').textContent = purchaseOrders.filter(o => o.status === 'completed' || o.status === 'paid').length;
+            document.getElementById('statPending').textContent = purchaseOrders.filter(o => o.status === 'pending').length;
         }
 
         function filterOrders(type, btn) {
@@ -371,6 +372,15 @@
                 return;
             }
 
+            const typeNames = {
+                stars: '⭐ Telegram Stars',
+                premium: '💎 Telegram Premium',
+                gift: '🎁 Telegram Gift',
+                phone: '📱 Virtual Raqam',
+                topup: '💳 Hisob To\'ldirish',
+                deposit: '💳 Hisob To\'ldirish',
+            };
+
             let html = '';
             orders.forEach(o => {
                 const st = (o.status || 'completed').toLowerCase();
@@ -379,7 +389,8 @@
                 if (st === 'pending') { stLabel = 'Kutilmoqda'; stClass = 'pending'; }
                 else if (st === 'rejected' || st === 'cancelled') { stLabel = 'Bekor qilindi'; stClass = 'rejected'; }
 
-                const typeTitle = o.product_type || o.type || 'Xarid';
+                const rawType = (o.product_type || o.type || 'xarid').toLowerCase();
+                const typeTitle = typeNames[rawType] || (rawType.charAt(0).toUpperCase() + rawType.slice(1));
                 const amount = Number(o.amount || o.price || 0).toLocaleString('uz-UZ') + " UZS";
                 const dateStr = o.created_at ? new Date(o.created_at).toLocaleString('uz-UZ') : 'Yaqinda';
 

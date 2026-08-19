@@ -422,15 +422,38 @@
                 if (data && data.ok) {
                     const cnt = document.getElementById('ordersCount');
                     const spent = document.getElementById('totalSpent');
-                    if (cnt) cnt.textContent = data.orders_count || (data.orders ? data.orders.length : 0);
+
+                    // Filter only real purchase orders (exclude topup and deposits)
+                    const purchaseOrders = (data.orders || []).filter(o => 
+                        o.product_type !== 'topup' && 
+                        o.product_type !== 'deposit' && 
+                        o.product_type !== 'balance' &&
+                        o.status !== 'cancelled' &&
+                        o.status !== 'failed' &&
+                        o.status !== 'rejected'
+                    );
+
+                    const ordersCount = (typeof data.orders_count === 'number') ? data.orders_count : purchaseOrders.length;
+                    if (cnt) cnt.textContent = String(ordersCount);
+
+                    let totalSpent = 0;
+                    if (typeof data.total_spent === 'number') {
+                        totalSpent = data.total_spent;
+                    } else {
+                        purchaseOrders.forEach(o => {
+                            if (o.status === 'completed' || o.status === 'paid') {
+                                totalSpent += Number(o.amount || 0);
+                            }
+                        });
+                    }
+
                     if (spent) {
-                        const sNum = data.total_spent || 0;
-                        if (sNum >= 1000000) {
-                            spent.textContent = (sNum / 1000000).toFixed(1) + 'M';
-                        } else if (sNum >= 1000) {
-                            spent.textContent = (sNum / 1000).toFixed(0) + 'k';
+                        if (totalSpent >= 1000000) {
+                            spent.textContent = (totalSpent / 1000000).toFixed(1) + 'M';
+                        } else if (totalSpent >= 1000) {
+                            spent.textContent = (totalSpent / 1000).toFixed(0) + 'k';
                         } else {
-                            spent.textContent = sNum.toLocaleString('uz-UZ');
+                            spent.textContent = totalSpent.toLocaleString('uz-UZ');
                         }
                     }
                 }
