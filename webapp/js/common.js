@@ -811,7 +811,7 @@ function initSplashScreen() {
         splash.id = 'appSplashScreen';
         splash.innerHTML = `
             <div class="splash-icon-box">
-                <img src="images/duck_anim.webp" alt="CoinStat">
+                <img src="images/rocket.webp" alt="CoinStat">
             </div>
             <div class="splash-brand-title">COINSTAT UZ</div>
             <div class="splash-dots-row">
