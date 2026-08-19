@@ -479,63 +479,66 @@
                     body: JSON.stringify({ period: period, initData: tg.initData || '' })
                 });
                 const data = await res.json();
-                let list = (data && data.ok && data.rating && data.rating.length) ? data.rating : [
-                    { username: 'crypto_king', total: 120500000 },
-                    { username: 'usdt_guru', total: 70000000 },
-                    { username: 'coin_master', total: 60800000 },
-                    { username: 'trading_pro', total: 45200000 },
-                    { username: 'invest_queen', total: 31100000 },
-                    { username: 'market_wiz', total: 26800000 }
-                ];
-
+                const list = (data && data.ok && Array.isArray(data.rating)) ? data.rating : [];
                 renderPodiumAndList(list, currentUserId);
             } catch (err) {
-                let demoList = [
-                    { username: 'crypto_king', total: 120500000 },
-                    { username: 'usdt_guru', total: 70000000 },
-                    { username: 'coin_master', total: 60800000 },
-                    { username: 'trading_pro', total: 45200000 },
-                    { username: 'invest_queen', total: 31100000 },
-                    { username: 'market_wiz', total: 26800000 }
-                ];
-                renderPodiumAndList(demoList, currentUserId);
+                renderPodiumAndList([], currentUserId);
             }
         }
 
         function renderPodiumAndList(list, currentUserId) {
-            // #1
-            if (list[0]) {
-                document.getElementById('podiumUser1').textContent = '@' + (list[0].username || 'User#1');
-                document.getElementById('podiumAmount1').textContent = Number(list[0].total || 0).toLocaleString('uz-UZ') + ' UZS';
+            const container = document.getElementById('leaderboardList');
+
+            // 1st Place (Center)
+            if (list[0] && list[0].total > 0) {
+                document.getElementById('podiumUser1').textContent = '@' + (list[0].username || 'User#' + list[0].telegram_id);
+                document.getElementById('podiumAmount1').textContent = Number(list[0].total).toLocaleString('uz-UZ') + ' UZS';
+                document.getElementById('podium1').style.opacity = '1';
+            } else {
+                document.getElementById('podiumUser1').textContent = 'Bo\'sh';
+                document.getElementById('podiumAmount1').textContent = '0 UZS';
+                document.getElementById('podium1').style.opacity = '0.5';
             }
-            // #2
-            if (list[1]) {
-                document.getElementById('podiumUser2').textContent = '@' + (list[1].username || 'User#2');
-                document.getElementById('podiumAmount2').textContent = Number(list[1].total || 0).toLocaleString('uz-UZ') + ' UZS';
+
+            // 2nd Place (Left)
+            if (list[1] && list[1].total > 0) {
+                document.getElementById('podiumUser2').textContent = '@' + (list[1].username || 'User#' + list[1].telegram_id);
+                document.getElementById('podiumAmount2').textContent = Number(list[1].total).toLocaleString('uz-UZ') + ' UZS';
+                document.getElementById('podium2').style.opacity = '1';
+            } else {
+                document.getElementById('podiumUser2').textContent = 'Bo\'sh';
+                document.getElementById('podiumAmount2').textContent = '0 UZS';
+                document.getElementById('podium2').style.opacity = '0.5';
             }
-            // #3
-            if (list[2]) {
-                document.getElementById('podiumUser3').textContent = '@' + (list[2].username || 'User#3');
-                document.getElementById('podiumAmount3').textContent = Number(list[2].total || 0).toLocaleString('uz-UZ') + ' UZS';
+
+            // 3rd Place (Right)
+            if (list[2] && list[2].total > 0) {
+                document.getElementById('podiumUser3').textContent = '@' + (list[2].username || 'User#' + list[2].telegram_id);
+                document.getElementById('podiumAmount3').textContent = Number(list[2].total).toLocaleString('uz-UZ') + ' UZS';
+                document.getElementById('podium3').style.opacity = '1';
+            } else {
+                document.getElementById('podiumUser3').textContent = 'Bo\'sh';
+                document.getElementById('podiumAmount3').textContent = '0 UZS';
+                document.getElementById('podium3').style.opacity = '0.5';
             }
 
             // Remaining list rows (from #4 onwards)
-            const container = document.getElementById('leaderboardList');
             let html = '';
             let myRank = null;
             let myTurnover = 0;
 
             list.forEach((item, i) => {
                 const rank = i + 1;
-                const uname = item.username ? '@' + item.username : 'User#' + (item.telegram_id || (i + 1));
-                const totalFormatted = Number(item.total || 0).toLocaleString('uz-UZ') + ' UZS';
+                const uname = item.username ? (item.username.startsWith('@') ? item.username : '@' + item.username) : 'User#' + (item.telegram_id || (i + 1));
+                const totalVal = Number(item.total || 0);
+                const totalFormatted = totalVal.toLocaleString('uz-UZ') + ' UZS';
 
                 if (String(item.telegram_id) === currentUserId || (tg.initDataUnsafe?.user?.username && item.username === tg.initDataUnsafe.user.username)) {
                     myRank = rank;
-                    myTurnover = item.total || 0;
+                    myTurnover = totalVal;
                 }
 
-                if (rank > 3) {
+                if (rank > 3 && totalVal > 0) {
                     html += `
                         <div class="leader-row-card">
                             <div class="leader-row-left">
@@ -554,29 +557,44 @@
                 }
             });
 
-            container.innerHTML = html;
-
-            // Fallback for user's personal turnover if not in top 50
-            if (myTurnover === 0 && currentUserId) {
-                try {
-                    fetch((apiBase ? apiBase : '') + '/api/user/transactions', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
-                        body: JSON.stringify({ telegram_id: currentUserId, initData: tg.initData || '' })
-                    }).then(r => r.json()).then(tData => {
-                        if (tData && tData.ok && typeof tData.total_spent === 'number') {
-                            myTurnover = tData.total_spent;
-                            if (myTurnoverEl) myTurnoverEl.textContent = Number(myTurnover).toLocaleString('uz-UZ') + ' UZS';
-                            if (myRankEl && !myRank) myRankEl.textContent = myTurnover > 0 ? '#50+' : '—';
-                        }
-                    }).catch(() => {});
-                } catch(e) {}
+            if (list.length === 0) {
+                html = `
+                    <div style="text-align: center; padding: 30px 16px; color: #71717a; font-size: 13px; font-weight: 600;">
+                        🛍 Hozircha hech kim xarid qilmagan.<br>Birinchi bo'lib xarid qiling va 1-o'rinni egallang!
+                    </div>
+                `;
             }
 
+            container.innerHTML = html;
+
+            // Fetch personal spent turnover from transactions
+            const apiBase = getApiBase();
             const myRankEl = document.getElementById('myRankNum');
             const myTurnoverEl = document.getElementById('myTurnoverVal');
-            if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '—';
-            if (myTurnoverEl) myTurnoverEl.textContent = myTurnover ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
+
+            if (currentUserId) {
+                fetch((apiBase ? apiBase : '') + '/api/user/transactions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
+                    body: JSON.stringify({ telegram_id: currentUserId, initData: tg.initData || '' })
+                }).then(r => r.json()).then(tData => {
+                    if (tData && tData.ok && typeof tData.total_spent === 'number') {
+                        myTurnover = tData.total_spent;
+                    }
+                    if (myTurnoverEl) {
+                        myTurnoverEl.textContent = myTurnover > 0 ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
+                    }
+                    if (myRankEl) {
+                        myRankEl.textContent = myRank ? `#${myRank}` : (myTurnover > 0 ? '#50+' : '—');
+                    }
+                }).catch(() => {
+                    if (myTurnoverEl) myTurnoverEl.textContent = myTurnover > 0 ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
+                    if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '—';
+                });
+            } else {
+                if (myTurnoverEl) myTurnoverEl.textContent = myTurnover > 0 ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
+                if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '—';
+            }
 
             if (tg.initDataUnsafe?.user?.photo_url) {
                 const myAv = document.getElementById('myAvatarImg');
