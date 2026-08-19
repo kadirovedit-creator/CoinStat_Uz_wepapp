@@ -11,7 +11,7 @@ import config
 
 def get_webapp_main_keyboard(user_id: int | None = None, lang: str = "uz", balance: int | None = None) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    admin_url = "https://t.me/cofeature"
+    admin_url = getattr(config, 'SUPPORT_URL', 'https://t.me/cofeature') or "https://t.me/cofeature"
     webapp_url = getattr(config, 'WEBAPP_URL', '') or ''
 
     if webapp_url.startswith("https://"):
@@ -30,24 +30,6 @@ def get_webapp_main_keyboard(user_id: int | None = None, lang: str = "uz", balan
                 web_app=WebAppInfo(url=url),
             )
         )
-
-    # Bot inline direct buttons (always accessible in chat)
-    topup_btn = "💰 Balans to'ldirish" if lang != "ru" else "💰 Пополнить баланс"
-    stars_btn = "⭐ Stars olish" if lang != "ru" else "⭐ Купить Stars"
-    prem_btn = "💎 Premium" if lang != "ru" else "💎 Премиум"
-    gift_btn = "🎁 Sovg'alar" if lang != "ru" else "🎁 Подарки"
-
-    builder.row(
-        InlineKeyboardButton(text=topup_btn, callback_data="topup_menu"),
-    )
-    builder.row(
-        InlineKeyboardButton(text=stars_btn, callback_data="stars_menu"),
-        InlineKeyboardButton(text=prem_btn, callback_data="premium_menu"),
-    )
-    builder.row(
-        InlineKeyboardButton(text=gift_btn, callback_data="gift_menu"),
-        InlineKeyboardButton(text="📦 Buyurtmalarim" if lang != "ru" else "📦 Мои заказы", callback_data="my_orders"),
-    )
 
     support_text = "💬 Support" if lang != "ru" else "💬 Поддержка"
     lang_text = "🌐 Til (Язык)" if lang != "ru" else "🌐 Язык (Til)"
