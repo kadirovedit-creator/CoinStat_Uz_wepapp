@@ -1080,28 +1080,19 @@ async def api_rating(request: web.Request) -> web.Response:
 
     query = f"""
       SELECT 
-        u.telegram_id, 
-        u.username, 
-        u.full_name,
-        COALESCE((
-          SELECT SUM(o.amount) 
-          FROM orders o 
-          WHERE o.telegram_id = u.telegram_id 
-            AND o.status IN ('completed', 'paid') 
-            AND o.product_type NOT LIKE 'topup%'
-            AND o.product_type NOT IN ('deposit', 'balance')
-            {time_cond}
-        ), 0) as total
-      FROM users u
-      WHERE EXISTS (
-        SELECT 1 FROM orders o 
-        WHERE o.telegram_id = u.telegram_id 
-          AND o.status IN ('completed', 'paid') 
-          AND o.product_type NOT LIKE 'topup%'
-          AND o.product_type NOT IN ('deposit', 'balance')
-          {time_cond}
-      )
-      ORDER BY total DESC, u.id ASC
+        o.telegram_id,
+        COALESCE(NULLIF(MAX(u.username), ''), NULLIF(MAX(o.target_username), ''), 'User#' || o.telegram_id) as username,
+        COALESCE(MAX(u.full_name), '') as full_name,
+        SUM(o.amount) as total
+      FROM orders o
+      LEFT JOIN users u ON u.telegram_id = o.telegram_id
+      WHERE o.status IN ('completed', 'paid')
+        AND o.product_type NOT LIKE 'topup%'
+        AND o.product_type NOT IN ('deposit', 'balance')
+        {time_cond}
+      GROUP BY o.telegram_id
+      HAVING SUM(o.amount) > 0
+      ORDER BY total DESC
       LIMIT 50
     """
   else:
@@ -1116,28 +1107,19 @@ async def api_rating(request: web.Request) -> web.Response:
 
     query = f"""
       SELECT 
-        u.telegram_id, 
-        u.username, 
-        u.full_name,
-        COALESCE((
-          SELECT SUM(o.amount) 
-          FROM orders o 
-          WHERE o.telegram_id = u.telegram_id 
-            AND o.status IN ('completed', 'paid') 
-            AND o.product_type NOT LIKE 'topup%'
-            AND o.product_type NOT IN ('deposit', 'balance')
-            {time_cond}
-        ), 0) as total
-      FROM users u
-      WHERE EXISTS (
-        SELECT 1 FROM orders o 
-        WHERE o.telegram_id = u.telegram_id 
-          AND o.status IN ('completed', 'paid') 
-          AND o.product_type NOT LIKE 'topup%'
-          AND o.product_type NOT IN ('deposit', 'balance')
-          {time_cond}
-      )
-      ORDER BY total DESC, u.id ASC
+        o.telegram_id,
+        COALESCE(NULLIF(MAX(u.username), ''), NULLIF(MAX(o.target_username), ''), 'User#' || o.telegram_id) as username,
+        COALESCE(MAX(u.full_name), '') as full_name,
+        SUM(o.amount) as total
+      FROM orders o
+      LEFT JOIN users u ON u.telegram_id = o.telegram_id
+      WHERE o.status IN ('completed', 'paid')
+        AND o.product_type NOT LIKE 'topup%'
+        AND o.product_type NOT IN ('deposit', 'balance')
+        {time_cond}
+      GROUP BY o.telegram_id
+      HAVING SUM(o.amount) > 0
+      ORDER BY total DESC
       LIMIT 50
     """
 
@@ -1145,25 +1127,14 @@ async def api_rating(request: web.Request) -> web.Response:
 
   rating = []
   for r in rows:
+    uname = r["username"] or (r["full_name"] if r["full_name"] else f"User#{r['telegram_id']}")
+    if uname.startswith("@"):
+      uname = uname[1:]
     rating.append({
       "telegram_id": r["telegram_id"],
-      "username": r["username"] or (r["full_name"] if r["full_name"] else f"User#{r['telegram_id']}"),
+      "username": uname,
       "total": int(r["total"] or 0),
     })
-
-  if not rating:
-    top_users = await db_conn.fetch("""
-      SELECT telegram_id, username, full_name, balance as total
-      FROM users
-      ORDER BY balance DESC, referrals DESC
-      LIMIT 10
-    """)
-    for u in top_users:
-      rating.append({
-        "telegram_id": u["telegram_id"],
-        "username": u["username"] or (u["full_name"] if u["full_name"] else f"User#{u['telegram_id']}"),
-        "total": int(u["total"] or 0),
-      })
 
   return web.json_response({"ok": True, "period": period, "rating": rating})
 

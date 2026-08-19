@@ -529,11 +529,13 @@
 
             list.forEach((item, i) => {
                 const rank = i + 1;
-                const uname = item.username ? (item.username.startsWith('@') ? item.username : '@' + item.username) : 'User#' + (item.telegram_id || (i + 1));
+                const rawUsername = (item.username || '').replace(/^@/, '');
+                const uname = rawUsername ? '@' + rawUsername : 'User#' + (item.telegram_id || (i + 1));
                 const totalVal = Number(item.total || 0);
                 const totalFormatted = totalVal.toLocaleString('uz-UZ') + ' UZS';
 
-                if (String(item.telegram_id) === currentUserId || (tg.initDataUnsafe?.user?.username && item.username === tg.initDataUnsafe.user.username)) {
+                const tgUsername = (tg.initDataUnsafe?.user?.username || '').replace(/^@/, '');
+                if (String(item.telegram_id) === currentUserId || (tgUsername && rawUsername.toLowerCase() === tgUsername.toLowerCase())) {
                     myRank = rank;
                     myTurnover = totalVal;
                 }
@@ -567,33 +569,37 @@
 
             container.innerHTML = html;
 
-            // Fetch personal spent turnover from transactions
-            const apiBase = getApiBase();
             const myRankEl = document.getElementById('myRankNum');
             const myTurnoverEl = document.getElementById('myTurnoverVal');
 
-            if (currentUserId) {
+            const setRankUI = (rank, turnover) => {
+                if (myRankEl) {
+                    if (rank) myRankEl.textContent = `#${rank}`;
+                    else if (turnover > 0) myRankEl.textContent = '#1';
+                    else myRankEl.textContent = '—';
+                }
+                if (myTurnoverEl) {
+                    myTurnoverEl.textContent = turnover > 0 ? Number(turnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
+                }
+            };
+
+            setRankUI(myRank, myTurnover);
+
+            // Fetch personal spent turnover from transactions if not determined
+            const apiBase = getApiBase();
+            if (currentUserId && !myRank) {
                 fetch((apiBase ? apiBase : '') + '/api/user/transactions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Telegram-Init-Data': tg.initData || '' },
                     body: JSON.stringify({ telegram_id: currentUserId, initData: tg.initData || '' })
                 }).then(r => r.json()).then(tData => {
                     if (tData && tData.ok && typeof tData.total_spent === 'number') {
-                        myTurnover = tData.total_spent;
+                        if (tData.total_spent > 0) {
+                            myTurnover = tData.total_spent;
+                            setRankUI(myRank || (list.length === 0 ? 1 : null), myTurnover);
+                        }
                     }
-                    if (myTurnoverEl) {
-                        myTurnoverEl.textContent = myTurnover > 0 ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
-                    }
-                    if (myRankEl) {
-                        myRankEl.textContent = myRank ? `#${myRank}` : (myTurnover > 0 ? '#50+' : '—');
-                    }
-                }).catch(() => {
-                    if (myTurnoverEl) myTurnoverEl.textContent = myTurnover > 0 ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
-                    if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '—';
-                });
-            } else {
-                if (myTurnoverEl) myTurnoverEl.textContent = myTurnover > 0 ? Number(myTurnover).toLocaleString('uz-UZ') + ' UZS' : '0 UZS';
-                if (myRankEl) myRankEl.textContent = myRank ? `#${myRank}` : '—';
+                }).catch(() => {});
             }
 
             if (tg.initDataUnsafe?.user?.photo_url) {

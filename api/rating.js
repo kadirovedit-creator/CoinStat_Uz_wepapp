@@ -45,28 +45,19 @@ module.exports = async (req, res) => {
     // Rank users ONLY by actual purchases / spending (excluding topup/deposit)
     const query = `
       SELECT 
-        u.telegram_id, 
-        u.username, 
-        u.full_name,
-        COALESCE((
-          SELECT SUM(o.amount) 
-          FROM orders o 
-          WHERE o.telegram_id = u.telegram_id 
-            AND o.status IN ('completed', 'paid') 
-            AND o.product_type NOT LIKE 'topup%'
-            AND o.product_type NOT IN ('deposit', 'balance')
-            ${timeFilter}
-        ), 0)::BIGINT as total
-      FROM users u
-      WHERE EXISTS (
-        SELECT 1 FROM orders o 
-        WHERE o.telegram_id = u.telegram_id 
-          AND o.status IN ('completed', 'paid') 
-          AND o.product_type NOT LIKE 'topup%'
-          AND o.product_type NOT IN ('deposit', 'balance')
-          ${timeFilter}
-      )
-      ORDER BY total DESC, u.id ASC
+        o.telegram_id,
+        COALESCE(NULLIF(MAX(u.username), ''), NULLIF(MAX(o.target_username), ''), 'User#' || o.telegram_id) as username,
+        COALESCE(MAX(u.full_name), '') as full_name,
+        SUM(o.amount)::BIGINT as total
+      FROM orders o
+      LEFT JOIN users u ON u.telegram_id = o.telegram_id
+      WHERE o.status IN ('completed', 'paid')
+        AND o.product_type NOT LIKE 'topup%'
+        AND o.product_type NOT IN ('deposit', 'balance')
+        ${timeFilter}
+      GROUP BY o.telegram_id
+      HAVING SUM(o.amount) > 0
+      ORDER BY total DESC
       LIMIT 50
     `;
 
@@ -74,7 +65,7 @@ module.exports = async (req, res) => {
 
     let rating = result.rows.map(r => ({
       telegram_id: Number(r.telegram_id),
-      username: r.username || (r.full_name ? r.full_name : `User#${r.telegram_id}`),
+      username: (r.username ? (r.username.startsWith('@') ? r.username.replace(/^@/, '') : r.username) : `User#${r.telegram_id}`),
       total: Number(r.total || 0),
     }));
 
