@@ -9,8 +9,11 @@ logger = logging.getLogger(__name__)
 
 # Read DATABASE_URL from env (default to sqlite:///database.db if not postgres)
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///database.db")
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+if DATABASE_URL:
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    if "channel_binding" in DATABASE_URL:
+        DATABASE_URL = DATABASE_URL.replace("&channel_binding=require", "").replace("channel_binding=require&", "").replace("?channel_binding=require", "")
 
 IS_SQLITE = not (DATABASE_URL and DATABASE_URL.startswith("postgres"))
 _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
